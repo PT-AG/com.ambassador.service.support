@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Com.Moonlay.EntityFrameworkCore" Version="1.0.0-alpha-10122017-003" />
+    <PackageReference Include="Com.Moonlay.NetCore.Lib" Version="1.0.0-alpha-20171102-001" />
+    <PackageReference Include="EPPlus.Core" Version="1.5.4" />
+    <PackageReference Include="iTextSharp.LGPLv2.Core" Version="1.4.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
+    <PackageReference Include="MlkPwgen" Version="0.3.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.8.2" />
+  </ItemGroup>
+
+</Project>
