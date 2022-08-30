@@ -70,23 +70,25 @@ namespace com.ambassador.support.webapi.Controllers.v1
             }
         }
 
-        [HttpGet("in")]
-        public IActionResult GetIN(string type, DateTime? dateFrom, DateTime? dateTo, int page, int size, string Order = "{}")
+        [HttpGet("expenditure-raw-material/download")]
+        public IActionResult GetXlsIN( DateTimeOffset? dateFrom, DateTimeOffset? dateTo)
         {
             int offset = Convert.ToInt32(Request.Headers["x-timezone-offset"]);
             string accept = Request.Headers["Accept"];
-
             try
             {
+                byte[] xlsInBytes;
+                //DateTime DateFrom = dateFrom == null ? new DateTime(1970, 1, 1) : Convert.ToDateTime(dateFrom);
+                //DateTime DateTo = dateTo == null ? DateTime.Now : Convert.ToDateTime(dateTo);
 
-                var data = factBeacukaiService.GetReportIN(type, dateFrom, dateTo, page, size, Order, offset);
+                var xls = expenditureRawMaterialService.GenerateExcel(dateFrom, dateTo, offset);
 
-                return Ok(new
-                {
-                    apiVersion = ApiVersion,
-                    data = data.Item1,
-                    info = new { total = data.Item2 }
-                });
+                string filename = String.Format("Laporan Pemakaian Bahan Baku - {0}.xlsx", DateTime.UtcNow.ToString("ddMMyyyy"));
+
+                xlsInBytes = xls.ToArray();
+                var file = File(xlsInBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename);
+                return file;
+
             }
             catch (Exception e)
             {
@@ -96,6 +98,33 @@ namespace com.ambassador.support.webapi.Controllers.v1
                 return StatusCode(General.INTERNAL_ERROR_STATUS_CODE, Result);
             }
         }
+
+        //[HttpGet("in")]
+        //public IActionResult GetIN(string type, DateTime? dateFrom, DateTime? dateTo, int page, int size, string Order = "{}")
+        //{
+        //    int offset = Convert.ToInt32(Request.Headers["x-timezone-offset"]);
+        //    string accept = Request.Headers["Accept"];
+
+        //    try
+        //    {
+
+        //        var data = factBeacukaiService.GetReportIN(type, dateFrom, dateTo, page, size, Order, offset);
+
+        //        return Ok(new
+        //        {
+        //            apiVersion = ApiVersion,
+        //            data = data.Item1,
+        //            info = new { total = data.Item2 }
+        //        });
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Dictionary<string, object> Result =
+        //            new ResultFormatter(ApiVersion, General.INTERNAL_ERROR_STATUS_CODE, e.Message)
+        //            .Fail();
+        //        return StatusCode(General.INTERNAL_ERROR_STATUS_CODE, Result);
+        //    }
+        //}
 
         //      [HttpGet("in/download")]
         //      public IActionResult GetXlsIN(string type, DateTime? dateFrom, DateTime? dateTo)

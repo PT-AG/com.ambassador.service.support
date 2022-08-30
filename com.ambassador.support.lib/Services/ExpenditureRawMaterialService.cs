@@ -114,5 +114,47 @@ namespace com.ambassador.support.lib.Services
 
             return Tuple.Create(Data, TotalData);
         }
+
+        public MemoryStream GenerateExcel(DateTimeOffset? dateFrom, DateTimeOffset? dateTo, int offset)
+        {
+            var Query = getQuery(dateFrom, dateTo, offset);
+            Query = Query.OrderBy(b => b.ExpenditureDate);
+            DataTable result = new DataTable();
+            result.Columns.Add(new DataColumn() { ColumnName = "No", DataType = typeof(String) });
+            result.Columns.Add(new DataColumn() { ColumnName = "No Bon", DataType = typeof(String) });
+            result.Columns.Add(new DataColumn() { ColumnName = "Tanggal Keluar", DataType = typeof(String) });
+            result.Columns.Add(new DataColumn() { ColumnName = "Kode Barang", DataType = typeof(String) });
+            result.Columns.Add(new DataColumn() { ColumnName = "Nama Barang", DataType = typeof(String) });
+            result.Columns.Add(new DataColumn() { ColumnName = "Satuan", DataType = typeof(String) });
+            result.Columns.Add(new DataColumn() { ColumnName = "Jml Digunakan", DataType = typeof(double) });
+            result.Columns.Add(new DataColumn() { ColumnName = "Jml DiSubKontrakan", DataType = typeof(double) });
+            result.Columns.Add(new DataColumn() { ColumnName = "Penerima SubKontrak", DataType = typeof(String) });
+
+            if (Query.ToArray().Count() == 0)
+            {
+                result.Rows.Add("", "", "", "", "", "", 0,0,""); // to allow column name to be generated properly for empty data as template
+            }
+            else
+            {
+                int i = 0;
+                foreach (var item in Query)
+                {
+                    i++;
+                    result.Rows.Add(i.ToString(), item.UENNo,formattedDate(item.ExpenditureDate), item.ProductCode, item.ProductName, item.UomUnit,item.Quantity,item.QuantitySubcon,item.SubconTo);
+                }
+            }
+            return Excel.CreateExcel(new List<KeyValuePair<DataTable, string>>() { new KeyValuePair<DataTable, string>(result, "Territory") }, true);
+
+        }
+
+        string formattedDate(string num)
+        {
+            DateTime date = DateTime.Parse(num);
+
+            string datee = date.ToString("dd MMMM yyyy");
+            
+
+            return datee;
+        }
     }
 }
