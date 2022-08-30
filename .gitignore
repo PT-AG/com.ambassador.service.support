@@ -261,3 +261,4 @@ __pycache__/
 *.pyc
 com.danliris.support.webapi/Properties/launchSettings.json
 com.danliris.support.webapi/appsettings.json
+com.ambassador.support.webapi/appsettings.json
