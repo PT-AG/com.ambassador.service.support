@@ -28,7 +28,9 @@ namespace com.ambassador.support.webapi.Controllers.v1
         private TraceableInService traceableInService { get; }
         private TraceableOutService traceableOutService { get; }
         private ExpenditureRawMaterialService expenditureRawMaterialService { get; }
-        public CustomsReportController(ExpenditureRawMaterialService expenditureRawMaterialService)
+        private ReceiptRawMaterialService receiptRawMaterialService { get; }
+
+        public CustomsReportController(ExpenditureRawMaterialService expenditureRawMaterialService, ReceiptRawMaterialService receiptRawMaterialService)
         {
 			this.scrapService = scrapService;
             this.factBeacukaiService = factBeacukaiService;
@@ -41,9 +43,10 @@ namespace com.ambassador.support.webapi.Controllers.v1
             this.traceableInService = traceableInService;
             this.traceableOutService = traceableOutService;
             this.expenditureRawMaterialService = expenditureRawMaterialService;
+            this.receiptRawMaterialService = receiptRawMaterialService;
         }
 
-		[HttpGet("expenditure-raw-material")]
+        [HttpGet("expenditure-raw-material")]
         public IActionResult GetExpenditureRawMaterial(string type, DateTimeOffset? dateFrom, DateTimeOffset? dateTo, int page, int size, string Order = "{}")
         {
             int offset = Convert.ToInt32(Request.Headers["x-timezone-offset"]);
@@ -84,6 +87,59 @@ namespace com.ambassador.support.webapi.Controllers.v1
                 var xls = expenditureRawMaterialService.GenerateExcel(dateFrom, dateTo, offset);
 
                 string filename = String.Format("Laporan Pemakaian Bahan Baku - {0}.xlsx", DateTime.UtcNow.ToString("ddMMyyyy"));
+
+                xlsInBytes = xls.ToArray();
+                var file = File(xlsInBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename);
+                return file;
+
+            }
+            catch (Exception e)
+            {
+                Dictionary<string, object> Result =
+                    new ResultFormatter(ApiVersion, General.INTERNAL_ERROR_STATUS_CODE, e.Message)
+                    .Fail();
+                return StatusCode(General.INTERNAL_ERROR_STATUS_CODE, Result);
+            }
+        }
+
+        [HttpGet("receipt-raw-material")]
+        public IActionResult GetReceiptRawMaterial(DateTime? dateFrom, DateTime? dateTo, int page, int size, string Order = "{}")
+        {
+            int offset = Convert.ToInt32(Request.Headers["x-timezone-offset"]);
+            string accept = Request.Headers["Accept"];
+
+            try
+            {
+                var data = receiptRawMaterialService.GetReport(dateFrom, dateTo, page, size, Order);
+
+                return Ok(new
+                {
+                    apiVersion = ApiVersion,
+                    data = data.Item1,
+                    info = new { total = data.Item2 }
+                });
+            }
+            catch (Exception e)
+            {
+                Dictionary<string, object> Result =
+                    new ResultFormatter(ApiVersion, General.INTERNAL_ERROR_STATUS_CODE, e.Message)
+                    .Fail();
+                return StatusCode(General.INTERNAL_ERROR_STATUS_CODE, Result);
+            }
+        }
+
+        [HttpGet("receipt-raw-material/download")]
+        public IActionResult GetExcelRawMaterial(DateTime? dateFrom, DateTime? dateTo)
+        {
+            int offset = Convert.ToInt32(Request.Headers["x-timezone-offset"]);
+            string accept = Request.Headers["Accept"];
+            try
+            {
+                byte[] xlsInBytes;
+           
+                var xls = receiptRawMaterialService.GenerateExcel(dateFrom, dateTo);
+
+                string filename = String.Format("Laporan Pemasukan Bahan Baku - {0}.xlsx", DateTime.UtcNow.ToString("ddMMyyyy"));
 
                 xlsInBytes = xls.ToArray();
                 var file = File(xlsInBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename);

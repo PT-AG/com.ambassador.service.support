@@ -69,6 +69,7 @@ namespace com.ambassador.support.webapi
             services.AddTransient<TraceableInService>();
             services.AddTransient<TraceableOutService>();
             services.AddTransient<ExpenditureRawMaterialService>();
+            services.AddTransient<ReceiptRawMaterialService>();
             services.AddTransient<IViewFactBeacukaiService, ViewFactBeacukaiService>();
             services
                 .AddTransient<IBeacukaiTempService, BeacukaiTempService>();
