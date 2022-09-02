@@ -29,8 +29,9 @@ namespace com.ambassador.support.webapi.Controllers.v1
         private TraceableOutService traceableOutService { get; }
         private ExpenditureRawMaterialService expenditureRawMaterialService { get; }
         private ReceiptRawMaterialService receiptRawMaterialService { get; }
+        private FinishingOutOfGoodService finishingOutOfGoodService { get; }
 
-        public CustomsReportController(ExpenditureRawMaterialService expenditureRawMaterialService, ReceiptRawMaterialService receiptRawMaterialService)
+        public CustomsReportController(ExpenditureRawMaterialService expenditureRawMaterialService, ReceiptRawMaterialService receiptRawMaterialService, FinishingOutOfGoodService finishingOutOfGoodService)
         {
 			this.scrapService = scrapService;
             this.factBeacukaiService = factBeacukaiService;
@@ -44,6 +45,7 @@ namespace com.ambassador.support.webapi.Controllers.v1
             this.traceableOutService = traceableOutService;
             this.expenditureRawMaterialService = expenditureRawMaterialService;
             this.receiptRawMaterialService = receiptRawMaterialService;
+            this.finishingOutOfGoodService = finishingOutOfGoodService;
         }
 
         [HttpGet("expenditure-raw-material")]
@@ -140,6 +142,59 @@ namespace com.ambassador.support.webapi.Controllers.v1
                 var xls = receiptRawMaterialService.GenerateExcel(dateFrom, dateTo);
 
                 string filename = String.Format("Laporan Pemasukan Bahan Baku - {0}.xlsx", DateTime.UtcNow.ToString("ddMMyyyy"));
+
+                xlsInBytes = xls.ToArray();
+                var file = File(xlsInBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename);
+                return file;
+
+            }
+            catch (Exception e)
+            {
+                Dictionary<string, object> Result =
+                    new ResultFormatter(ApiVersion, General.INTERNAL_ERROR_STATUS_CODE, e.Message)
+                    .Fail();
+                return StatusCode(General.INTERNAL_ERROR_STATUS_CODE, Result);
+            }
+        }
+
+        [HttpGet("finishing-out-of-good")]
+        public IActionResult GetFinisingOutOfGood(DateTime? dateFrom, DateTime? dateTo, int page, int size, string Order = "{}")
+        {
+            int offset = Convert.ToInt32(Request.Headers["x-timezone-offset"]);
+            string accept = Request.Headers["Accept"];
+
+            try
+            {
+                var data = finishingOutOfGoodService.GetReport(dateFrom, dateTo, page, size, Order);
+
+                return Ok(new
+                {
+                    apiVersion = ApiVersion,
+                    data = data.Item1,
+                    info = new { total = data.Item2 }
+                });
+            }
+            catch (Exception e)
+            {
+                Dictionary<string, object> Result =
+                    new ResultFormatter(ApiVersion, General.INTERNAL_ERROR_STATUS_CODE, e.Message)
+                    .Fail();
+                return StatusCode(General.INTERNAL_ERROR_STATUS_CODE, Result);
+            }
+        }
+
+        [HttpGet("finishing-out-of-good/download")]
+        public IActionResult GetExcelFinisingOutOfGood(DateTime? dateFrom, DateTime? dateTo)
+        {
+            int offset = Convert.ToInt32(Request.Headers["x-timezone-offset"]);
+            string accept = Request.Headers["Accept"];
+            try
+            {
+                byte[] xlsInBytes;
+
+                var xls = finishingOutOfGoodService.GenerateExcel(dateFrom, dateTo);
+
+                string filename = String.Format("Laporan Pemasukan Barang Jadi - {0}.xlsx", DateTime.UtcNow.ToString("ddMMyyyy"));
 
                 xlsInBytes = xls.ToArray();
                 var file = File(xlsInBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename);

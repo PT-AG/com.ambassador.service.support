@@ -35,8 +35,8 @@ namespace com.ambassador.support.lib.Services
                     using (SqlCommand cmd = new SqlCommand(
                         "declare @StartDate datetime = '" + d1 + "' declare @EndDate datetime = '" + d2 + "' " +
                         "select e.CustomsType,e.BeacukaiNo,convert(date,dateadd(hour,7,e.BeacukaiDate)) as BCDate,f.URNNo,convert(date,dateadd(hour,7,f.ReceiptDate)) as URNDate,g.ProductCode,g.ProductName," +
-                        "g.SmallQuantity,g.SmallUomUnit,a.DOCurrencyCode,(g.PricePerDealUnit * g.SmallQuantity * g.DOCurrencyRate) as Amount,a.SupplierName,a.Country from GarmentDeliveryOrders a  " +                       
-                        "join GarmentDeliveryOrderItems b on a.id=b.GarmentDOId join GarmentDeliveryOrderDetails c on b.id=c.GarmentDOItemId " +
+                        "g.SmallQuantity,g.SmallUomUnit,a.DOCurrencyCode,cast((g.PricePerDealUnit * g.SmallQuantity * g.DOCurrencyRate) as decimal(18,2)) as Amount,a.SupplierName,a.Country " +
+                        "from GarmentDeliveryOrders a join GarmentDeliveryOrderItems b on a.id=b.GarmentDOId join GarmentDeliveryOrderDetails c on b.id=c.GarmentDOItemId " +
                         "join GarmentBeacukaiItems d on d.GarmentDOId=a.id join GarmentBeacukais e on e.id=d.BeacukaiId " +
                         "join GarmentUnitReceiptNotes f on a.id=f.DOId join GarmentUnitReceiptNoteItems g on f.id=g.URNId " +
                         "where e.BeacukaiDate between @StartDate and @EndDate", conn))
@@ -57,9 +57,9 @@ namespace com.ambassador.support.lib.Services
                                 ProductCode = data["ProductCode"].ToString(),
                                 ProductName = data["ProductName"].ToString(),
                                 SmallUomUnit = data["SmallUomUnit"].ToString(),
-                                SmallQuantity = data["SmallQuantity"].ToString(),
+                                SmallQuantity = (decimal)data["SmallQuantity"],
                                 DOCurrencyCode = data["DOCurrencyCode"].ToString(),
-                                Amount = data["Amount"].ToString(),
+                                Amount = (decimal)data["Amount"],
                                 StorageName = "GUDANG AG2",
                                 SupplierName = data["SupplierName"].ToString(),
                                 Country = data["Country"].ToString()
@@ -114,9 +114,9 @@ namespace com.ambassador.support.lib.Services
             result.Columns.Add(new DataColumn() { ColumnName = "Kode Barang", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Nama Barang", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Satuan", DataType = typeof(String) });
-            result.Columns.Add(new DataColumn() { ColumnName = "Jumlah Terima", DataType = typeof(string) });
+            result.Columns.Add(new DataColumn() { ColumnName = "Jumlah Terima", DataType = typeof(double) });
             result.Columns.Add(new DataColumn() { ColumnName = "Mata Uang", DataType = typeof(String) });
-            result.Columns.Add(new DataColumn() { ColumnName = "Nilai Barang", DataType = typeof(string) });
+            result.Columns.Add(new DataColumn() { ColumnName = "Nilai Barang", DataType = typeof(double) });
             result.Columns.Add(new DataColumn() { ColumnName = "Gudang", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Penerima Sub Kontrak", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Negara Asal Barang", DataType = typeof(String) });
@@ -132,7 +132,7 @@ namespace com.ambassador.support.lib.Services
                 {
                     i++;
                     result.Rows.Add(i.ToString(),item.CustomsType,item.BeacukaiNo,formattedDate(item.BeacukaiDate),item.URNNo,formattedDate(item.URNDate),item.ProductCode,
-                                    item.ProductName,item.SmallUomUnit,item.SmallQuantity,item.DOCurrencyCode,item.StorageName,item.SupplierName,item.Country);
+                                    item.ProductName,item.SmallUomUnit,item.SmallQuantity,item.DOCurrencyCode,item.Amount,item.StorageName,item.SupplierName,item.Country);
                 }
             }
             return Excel.CreateExcel(new List<KeyValuePair<DataTable, string>>() { new KeyValuePair<DataTable, string>(result, "Territory") }, true);
