@@ -52,6 +52,7 @@ namespace com.ambassador.support.lib.Services
                                 CustomsType = data["CustomsType"].ToString(),
                                 BeacukaiNo = data["BeacukaiNo"].ToString(),
                                 BeacukaiDate = data["BCDate"].ToString(),
+                                SerialNo = "-",
                                 URNNo = data["URNNo"].ToString(),
                                 URNDate = data["URNDate"].ToString(),
                                 ProductCode = data["ProductCode"].ToString(),
@@ -106,9 +107,10 @@ namespace com.ambassador.support.lib.Services
             Query = Query.OrderBy(b => b.BeacukaiDate);
             DataTable result = new DataTable();
             result.Columns.Add(new DataColumn() { ColumnName = "No", DataType = typeof(String) });
-            result.Columns.Add(new DataColumn() { ColumnName = "Tipe BC", DataType = typeof(String) });
+            result.Columns.Add(new DataColumn() { ColumnName = "Jenis Dokumen", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "No Bea Cukai", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Tgl Bea Cukai", DataType = typeof(String) });
+            result.Columns.Add(new DataColumn() { ColumnName = "Nomor Seri Barang", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "No Bukti Penerimaan", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Tgl Bukti Penerimaan", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Kode Barang", DataType = typeof(String) });
@@ -123,7 +125,7 @@ namespace com.ambassador.support.lib.Services
 
             if (Query.ToArray().Count() == 0)
             {
-                result.Rows.Add("", "", "", "", "", "", "", "", "", 0, "", 0, "", "", ""); // to allow column name to be generated properly for empty data as template
+                result.Rows.Add("", "", "", "", "", "", "", "", "", "", 0, "", 0, "", "", ""); // to allow column name to be generated properly for empty data as template
             }
             else
             {
@@ -131,7 +133,7 @@ namespace com.ambassador.support.lib.Services
                 foreach (var item in Query)
                 {
                     i++;
-                    result.Rows.Add(i.ToString(),item.CustomsType,item.BeacukaiNo,formattedDate(item.BeacukaiDate),item.URNNo,formattedDate(item.URNDate),item.ProductCode,
+                    result.Rows.Add(i.ToString(),item.CustomsType,item.BeacukaiNo,formattedDate(item.BeacukaiDate),item.SerialNo,item.URNNo,formattedDate(item.URNDate),item.ProductCode,
                                     item.ProductName,item.SmallUomUnit,item.SmallQuantity,item.DOCurrencyCode,item.Amount,item.StorageName,item.SupplierName,item.Country);
                 }
             }
