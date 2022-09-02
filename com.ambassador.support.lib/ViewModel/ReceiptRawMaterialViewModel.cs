@@ -13,10 +13,10 @@ namespace com.ambassador.support.lib.ViewModel
         public string URNDate { get; set; }
         public string ProductCode { get; set; }
         public string ProductName { get; set; }
-        public string SmallQuantity { get; set; }
+        public decimal SmallQuantity { get; set; }
         public string SmallUomUnit { get; set; }
         public string DOCurrencyCode { get; set; }        
-        public string Amount { get; set; }
+        public decimal Amount { get; set; }
         public string StorageName { get; set; }
         public string SupplierName { get; set; }
         public string Country { get; set; }        
