@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using com.ambassador.support.lib.Interfaces;
 using com.ambassador.support.lib.Services;
 using com.ambassador.support.webapi.Helpers;
 using Microsoft.AspNetCore.Authorization;
@@ -27,11 +28,13 @@ namespace com.ambassador.support.webapi.Controllers.v1
         private ExpenditureGoodsService expenditureGoodsService { get; }
         private TraceableInService traceableInService { get; }
         private TraceableOutService traceableOutService { get; }
-        private ExpenditureRawMaterialService expenditureRawMaterialService { get; }
-        private ReceiptRawMaterialService receiptRawMaterialService { get; }
+        //private ExpenditureRawMaterialService expenditureRawMaterialService { get; }
+        private readonly IExpenditureRawMaterialService expenditureRawMaterialService;
+        private readonly IReceiptRawMaterialService receiptRawMaterialService;
+        //private ReceiptRawMaterialService receiptRawMaterialService { get; }
         private FinishingOutOfGoodService finishingOutOfGoodService { get; }
 
-        public CustomsReportController(ExpenditureRawMaterialService expenditureRawMaterialService, ReceiptRawMaterialService receiptRawMaterialService, FinishingOutOfGoodService finishingOutOfGoodService)
+        public CustomsReportController(IExpenditureRawMaterialService expenditureRawMaterialService, IReceiptRawMaterialService receiptRawMaterialService)
         {
 			this.scrapService = scrapService;
             this.factBeacukaiService = factBeacukaiService;
@@ -45,7 +48,7 @@ namespace com.ambassador.support.webapi.Controllers.v1
             this.traceableOutService = traceableOutService;
             this.expenditureRawMaterialService = expenditureRawMaterialService;
             this.receiptRawMaterialService = receiptRawMaterialService;
-            this.finishingOutOfGoodService = finishingOutOfGoodService;
+            //this.finishingOutOfGoodService = finishingOutOfGoodService;
         }
 
         [HttpGet("expenditure-raw-material")]
