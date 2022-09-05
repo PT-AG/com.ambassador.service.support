@@ -34,7 +34,7 @@ namespace com.ambassador.support.webapi.Controllers.v1
         //private ReceiptRawMaterialService receiptRawMaterialService { get; }
         private FinishingOutOfGoodService finishingOutOfGoodService { get; }
 
-        public CustomsReportController(IExpenditureRawMaterialService expenditureRawMaterialService, IReceiptRawMaterialService receiptRawMaterialService)
+        public CustomsReportController(IExpenditureRawMaterialService expenditureRawMaterialService, IReceiptRawMaterialService receiptRawMaterialService, FinishingOutOfGoodService finishingOutOfGoodService)
         {
 			this.scrapService = scrapService;
             this.factBeacukaiService = factBeacukaiService;
@@ -48,7 +48,7 @@ namespace com.ambassador.support.webapi.Controllers.v1
             this.traceableOutService = traceableOutService;
             this.expenditureRawMaterialService = expenditureRawMaterialService;
             this.receiptRawMaterialService = receiptRawMaterialService;
-            //this.finishingOutOfGoodService = finishingOutOfGoodService;
+            this.finishingOutOfGoodService = finishingOutOfGoodService;
         }
 
         [HttpGet("expenditure-raw-material")]
