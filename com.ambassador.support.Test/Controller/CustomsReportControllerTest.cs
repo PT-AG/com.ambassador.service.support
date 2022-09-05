@@ -34,7 +34,7 @@ namespace com.ambassador.support.Test.Controller
             };
             user.Setup(u => u.Claims).Returns(claims);
 
-            CustomsReportController controller = new CustomsReportController(facadeMock.Object, facemock2.Object);
+            CustomsReportController controller = new CustomsReportController(facadeMock.Object, facemock2.Object,null);
 
             controller.ControllerContext = new ControllerContext()
             {
