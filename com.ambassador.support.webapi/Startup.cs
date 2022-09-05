@@ -16,6 +16,7 @@ using Newtonsoft.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Swagger;
+using com.ambassador.support.lib.Interfaces;
 
 namespace com.ambassador.support.webapi
 {
@@ -68,8 +69,8 @@ namespace com.ambassador.support.webapi
                 .AddTransient<ExpenditureGoodsService>();
             services.AddTransient<TraceableInService>();
             services.AddTransient<TraceableOutService>();
-            services.AddTransient<ExpenditureRawMaterialService>();
-            services.AddTransient<ReceiptRawMaterialService>();
+            services.AddTransient<IExpenditureRawMaterialService, ExpenditureRawMaterialService >();
+            services.AddTransient<IReceiptRawMaterialService, ReceiptRawMaterialService>();
             services.AddTransient<FinishingOutOfGoodService>();
             services.AddTransient<IViewFactBeacukaiService, ViewFactBeacukaiService>();
             services

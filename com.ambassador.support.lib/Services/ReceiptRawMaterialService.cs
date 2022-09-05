@@ -1,4 +1,5 @@
 ﻿using com.ambassador.support.lib.Helpers;
+using com.ambassador.support.lib.Interfaces;
 using com.ambassador.support.lib.ViewModel;
 using Com.Moonlay.NetCore.Lib;
 using Newtonsoft.Json;
@@ -12,7 +13,7 @@ using System.Text;
 
 namespace com.ambassador.support.lib.Services
 {
-    public class ReceiptRawMaterialService
+    public class ReceiptRawMaterialService : IReceiptRawMaterialService
     {
         SupportDbContext context;
         public ReceiptRawMaterialService(SupportDbContext _context)

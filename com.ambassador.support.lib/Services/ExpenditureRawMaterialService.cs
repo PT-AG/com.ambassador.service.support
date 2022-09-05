@@ -1,4 +1,5 @@
 ﻿using com.ambassador.support.lib.Helpers;
+using com.ambassador.support.lib.Interfaces;
 using com.ambassador.support.lib.ViewModel;
 using Com.Moonlay.NetCore.Lib;
 using Newtonsoft.Json;
@@ -12,7 +13,7 @@ using System.Text;
 
 namespace com.ambassador.support.lib.Services
 {
-    public class ExpenditureRawMaterialService
+    public class ExpenditureRawMaterialService : IExpenditureRawMaterialService
     {
         SupportDbContext context;
         public ExpenditureRawMaterialService(SupportDbContext _context)
@@ -44,7 +45,7 @@ namespace com.ambassador.support.lib.Services
                         "left join GarmentDOItems h on h.URNItemId=g.Id " +
                         "left join GarmentUnitDeliveryOrderItems i on i.DOItemsId=h.Id join GarmentUnitDeliveryOrders j on j.id=i.UnitDOId " +
                         "left join GarmentUnitExpenditureNoteItems k on k.UnitDOItemId=i.Id join GarmentUnitExpenditureNotes l on l.id=k.UENId " +
-                        "where l.CreatedUtc between @StartDate and @EndDate", conn))
+                        "where DATEADD(HOUR,7,l.CreatedUtc) between @StartDate and @EndDate", conn))
 
                     {
                         SqlDataAdapter dataAdapter = new SqlDataAdapter(cmd);
