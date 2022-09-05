@@ -9,6 +9,7 @@ namespace com.ambassador.support.lib.ViewModel
         public string CustomsType { get; set; }
         public string BeacukaiNo { get; set; }
         public string BeacukaiDate { get; set; }
+        public string SerialNo { get; set; }
         public string URNNo { get; set; }
         public string URNDate { get; set; }
         public string ProductCode { get; set; }
