@@ -13,19 +13,19 @@ using System.Text;
 
 namespace com.ambassador.support.lib.Services
 {
-    public class FinishingOutOfGoodService : IFinishingOutOfGoodService
+    public class WasteScrapService : IWasteScrapService
     {
         SupportDbContext context;
-        public FinishingOutOfGoodService(SupportDbContext _context)
+        public WasteScrapService(SupportDbContext _context)
         {
             this.context = _context;
         }
-        public IQueryable<FinishingOutOfGoodViewModel> getQuery(DateTime? dateFrom, DateTime? dateTo)
+        public IQueryable<WasteScrapViewModel> getQuery(DateTime? dateFrom, DateTime? dateTo)
         {
             var d1 = dateFrom.Value.ToString("yyyy-MM-dd");
             var d2 = dateTo.Value.ToString("yyyy-MM-dd");
          
-            List<FinishingOutOfGoodViewModel> reportData = new List<FinishingOutOfGoodViewModel>();
+            List<WasteScrapViewModel> reportData = new List<WasteScrapViewModel>();
 
             try
             {
@@ -35,25 +35,25 @@ namespace com.ambassador.support.lib.Services
                     conn.Open();
                     using (SqlCommand cmd = new SqlCommand(
                         "declare @StartDate datetime = '" + d1 + "' declare @EndDate datetime = '" + d2 + "' " +
-                        "select a.FinishingOutNo,convert(date,dateadd(hour,7,a.FinishingOutDate)) as FODate,a.ComodityCode,a.ComodityName,b.Quantity,b.UomUnit,c.FinishingInType from GarmentFinishingOuts a  " +
-                        "join GarmentFinishingOutItems b on a.[Identity] = b.FinishingOutId join GarmentFinishingIns c on b.FinishingInId=c.[Identity] " +
-                        "where a.FinishingTo='GUDANG JADI' and  a.CreatedDate between @StartDate and @EndDate", conn))
+                        "select c.Code,b.ScrapClassificationName,b.Quantity,b.UomUnit from GarmentScrapTransactions a join GarmentScrapTransactionItems b " +
+                        "on a.[Identity] = b.ScrapTransactionId join GarmentScrapClassifications c on b.ScrapClassificationId = c.[Identity] " +
+                        "where a.CreatedDate between @StartDate and @EndDate", conn))
+
                     {
                         SqlDataAdapter dataAdapter = new SqlDataAdapter(cmd);
                         DataSet dSet = new DataSet();
                         dataAdapter.Fill(dSet);
                         foreach (DataRow data in dSet.Tables[0].Rows)
                         {
-                            FinishingOutOfGoodViewModel view = new FinishingOutOfGoodViewModel
+                            WasteScrapViewModel view = new WasteScrapViewModel
                             {
-                                FinishingOutNo = data["FinishingOutNo"].ToString(),
-                                FinishingOutDate = data["FODate"].ToString(),
-                                ProductCode = data["ComodityCode"].ToString(),
-                                ProductName = data["ComodityName"].ToString(),
+                                BeacukaiNo = "-", //data["BeacukaiNo"].ToString(),
+                                BeacukaiDate = "-",//data["BCDate"].ToString(),
+                                ProductCode = data["Code"].ToString(),
+                                ProductName = data["ScrapClassificationName"].ToString(),
                                 UomUnit = data["UomUnit"].ToString(),
-                                Quantity = data["FinishingInType"].ToString() == "SEWING" ? (double)data["Quantity"] : 0,
-                                QuantitySC = data["FinishingInType"].ToString() != "SEWING" ? (double)data["Quantity"] : 0,
-                                StorageName = "GUDANG JADI",                                
+                                Quantity = (decimal)data["Quantity"],
+                                Amount = 0//(decimal)data["Amount"]                             
                             };
                             reportData.Add(view);
                         }
@@ -66,14 +66,14 @@ namespace com.ambassador.support.lib.Services
             }
             return reportData.AsQueryable();
         }
-        public Tuple<List<FinishingOutOfGoodViewModel>, int> GetReport(DateTime? dateFrom, DateTime? dateTo, int page, int size, string Order)
+        public Tuple<List<WasteScrapViewModel>, int> GetReport(DateTime? dateFrom, DateTime? dateTo, int page, int size, string Order)
         {
             var Query = getQuery(dateFrom, dateTo);
 
             Dictionary<string, string> OrderDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(Order);
             if (OrderDictionary.Count.Equals(0))
             {
-                Query = Query.OrderBy(b => b.FinishingOutDate);
+                Query = Query.OrderBy(b => b.BeacukaiDate);
             }
             else
             {
@@ -83,8 +83,8 @@ namespace com.ambassador.support.lib.Services
                 //Query = Query.OrderBy(string.Concat(Key, " ", OrderType));
             }
 
-            Pageable<FinishingOutOfGoodViewModel> pageable = new Pageable<FinishingOutOfGoodViewModel>(Query, page - 1, size);
-            List<FinishingOutOfGoodViewModel> Data = pageable.Data.ToList<FinishingOutOfGoodViewModel>();
+            Pageable<WasteScrapViewModel> pageable = new Pageable<WasteScrapViewModel>(Query, page - 1, size);
+            List<WasteScrapViewModel> Data = pageable.Data.ToList<WasteScrapViewModel>();
 
             int TotalData = pageable.TotalCount;
 
@@ -94,21 +94,20 @@ namespace com.ambassador.support.lib.Services
         public MemoryStream GenerateExcel(DateTime? dateFrom, DateTime? dateTo)
         {
             var Query = getQuery(dateFrom, dateTo);
-            Query = Query.OrderBy(b => b.FinishingOutDate);
+            Query = Query.OrderBy(b => b.BeacukaiDate);
             DataTable result = new DataTable();
             result.Columns.Add(new DataColumn() { ColumnName = "No", DataType = typeof(String) });
-            result.Columns.Add(new DataColumn() { ColumnName = "No Bukti Penerimaan", DataType = typeof(String) });
-            result.Columns.Add(new DataColumn() { ColumnName = "Tgl Bukti Penerimaan", DataType = typeof(String) });
+            result.Columns.Add(new DataColumn() { ColumnName = "No Bea Cukai", DataType = typeof(String) });
+            result.Columns.Add(new DataColumn() { ColumnName = "Tgl Bea Cukai", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Kode Barang", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Nama Barang", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Satuan", DataType = typeof(String) });
-            result.Columns.Add(new DataColumn() { ColumnName = "Jumlah Dari Produksi", DataType = typeof(double) });
-            result.Columns.Add(new DataColumn() { ColumnName = "Jumlah Dari Sub Kontrak", DataType = typeof(double) });
-            result.Columns.Add(new DataColumn() { ColumnName = "Gudang", DataType = typeof(String) });
-           
+            result.Columns.Add(new DataColumn() { ColumnName = "Jumlah", DataType = typeof(double) });
+            result.Columns.Add(new DataColumn() { ColumnName = "Nilai", DataType = typeof(double) });
+            
             if (Query.ToArray().Count() == 0)
             {
-                result.Rows.Add("", "", "", "", "", "", 0, 0, ""); // to allow column name to be generated properly for empty data as template
+                result.Rows.Add("", "", "", "", "", "", 0, 0); // to allow column name to be generated properly for empty data as template
             }
             else
             {
@@ -116,8 +115,7 @@ namespace com.ambassador.support.lib.Services
                 foreach (var item in Query)
                 {
                     i++;
-                    result.Rows.Add(i.ToString(),item.FinishingOutNo,formattedDate(item.FinishingOutDate),item.ProductCode,
-                                    item.ProductName,item.UomUnit,item.Quantity,item.QuantitySC,item.StorageName);
+                    result.Rows.Add(i.ToString(),item.BeacukaiNo,formattedDate(item.BeacukaiDate),item.ProductCode,item.ProductName,item.UomUnit,item.Quantity,item.Amount);
                 }
             }
             return Excel.CreateExcel(new List<KeyValuePair<DataTable, string>>() { new KeyValuePair<DataTable, string>(result, "Territory") }, true);
@@ -130,7 +128,6 @@ namespace com.ambassador.support.lib.Services
 
             string datee = date.ToString("dd MMMM yyyy");
             
-
             return datee;
         }
     }
