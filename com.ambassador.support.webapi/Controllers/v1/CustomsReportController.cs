@@ -28,16 +28,14 @@ namespace com.ambassador.support.webapi.Controllers.v1
         private ExpenditureGoodsService expenditureGoodsService { get; }
         private TraceableInService traceableInService { get; }
         private TraceableOutService traceableOutService { get; }
-        //private ExpenditureRawMaterialService expenditureRawMaterialService { get; }
         private readonly IExpenditureRawMaterialService expenditureRawMaterialService;
         private readonly IReceiptRawMaterialService receiptRawMaterialService;
-        //private ReceiptRawMaterialService receiptRawMaterialService { get; }
-        //private FinishingOutOfGoodService finishingOutOfGoodService { get; }
         private readonly IFinishingOutOfGoodService finishingOutOfGoodService;
         private readonly IWasteScrapService wasteScrapService;
+        private readonly IWIPInSubconService wIPInSubconService;
 
 
-        public CustomsReportController(IExpenditureRawMaterialService expenditureRawMaterialService, IReceiptRawMaterialService receiptRawMaterialService, IFinishingOutOfGoodService finishingOutOfGoodService, IWasteScrapService wasteScrapService)
+        public CustomsReportController(IExpenditureRawMaterialService expenditureRawMaterialService, IReceiptRawMaterialService receiptRawMaterialService, IFinishingOutOfGoodService finishingOutOfGoodService, IWasteScrapService wasteScrapService, IWIPInSubconService wIPInSubconService)
         {
 			this.scrapService = scrapService;
             this.factBeacukaiService = factBeacukaiService;
@@ -53,10 +51,11 @@ namespace com.ambassador.support.webapi.Controllers.v1
             this.receiptRawMaterialService = receiptRawMaterialService;
             this.finishingOutOfGoodService = finishingOutOfGoodService;
             this.wasteScrapService = wasteScrapService;
+            this.wIPInSubconService = wIPInSubconService;
         }
 
         [HttpGet("expenditure-raw-material")]
-        public IActionResult GetExpenditureRawMaterial(string type, DateTimeOffset? dateFrom, DateTimeOffset? dateTo, int page, int size, string Order = "{}")
+        public IActionResult GetExpenditureRawMaterial(DateTimeOffset? dateFrom, DateTimeOffset? dateTo, int page, int size, string Order = "{}")
         {
             int offset = Convert.ToInt32(Request.Headers["x-timezone-offset"]);
             string accept = Request.Headers["Accept"];
@@ -255,6 +254,62 @@ namespace com.ambassador.support.webapi.Controllers.v1
                 var xls = wasteScrapService.GenerateExcel(dateFrom, dateTo);
 
                 string filename = String.Format("Laporan Penyelesaian Waste Scrap - {0}.xlsx", DateTime.UtcNow.ToString("ddMMyyyy"));
+
+                xlsInBytes = xls.ToArray();
+                var file = File(xlsInBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename);
+                return file;
+
+            }
+            catch (Exception e)
+            {
+                Dictionary<string, object> Result =
+                    new ResultFormatter(ApiVersion, General.INTERNAL_ERROR_STATUS_CODE, e.Message)
+                    .Fail();
+                return StatusCode(General.INTERNAL_ERROR_STATUS_CODE, Result);
+            }
+        }
+
+        [HttpGet("wip-in-subcon")]
+        public IActionResult GetWipInSubcon(DateTimeOffset? dateFrom, DateTimeOffset? dateTo, int page, int size, string Order = "{}")
+        {
+            int offset = Convert.ToInt32(Request.Headers["x-timezone-offset"]);
+            string accept = Request.Headers["Accept"];
+
+            try
+            {
+
+                var data = wIPInSubconService.GetReport(dateFrom, dateTo, page, size, Order, offset);
+
+                return Ok(new
+                {
+                    apiVersion = ApiVersion,
+                    data = data.Item1,
+                    info = new { total = data.Item2 }
+                });
+            }
+            catch (Exception e)
+            {
+                Dictionary<string, object> Result =
+                    new ResultFormatter(ApiVersion, General.INTERNAL_ERROR_STATUS_CODE, e.Message)
+                    .Fail();
+                return StatusCode(General.INTERNAL_ERROR_STATUS_CODE, Result);
+            }
+        }
+
+        [HttpGet("wip-in-subcon/download")]
+        public IActionResult GetXlsWipInSubcon(DateTimeOffset? dateFrom, DateTimeOffset? dateTo)
+        {
+            int offset = Convert.ToInt32(Request.Headers["x-timezone-offset"]);
+            string accept = Request.Headers["Accept"];
+            try
+            {
+                byte[] xlsInBytes;
+                //DateTime DateFrom = dateFrom == null ? new DateTime(1970, 1, 1) : Convert.ToDateTime(dateFrom);
+                //DateTime DateTo = dateTo == null ? DateTime.Now : Convert.ToDateTime(dateTo);
+
+                var xls = wIPInSubconService.GenerateExcel(dateFrom, dateTo, offset);
+
+                string filename = String.Format("Laporan Pemakaian Barang Dalam Proses Subkontrak - {0}.xlsx", DateTime.UtcNow.ToString("ddMMyyyy"));
 
                 xlsInBytes = xls.ToArray();
                 var file = File(xlsInBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename);
