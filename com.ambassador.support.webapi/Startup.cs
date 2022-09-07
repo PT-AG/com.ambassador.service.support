@@ -73,6 +73,7 @@ namespace com.ambassador.support.webapi
             services.AddTransient<IReceiptRawMaterialService, ReceiptRawMaterialService>();
             services.AddTransient<IFinishingOutOfGoodService, FinishingOutOfGoodService>();
             services.AddTransient<IWasteScrapService, WasteScrapService>();
+            services.AddTransient<IWIPInSubconService, WIPInSubconService>();
             services.AddTransient<IViewFactBeacukaiService, ViewFactBeacukaiService>();
             services
                 .AddTransient<IBeacukaiTempService, BeacukaiTempService>();

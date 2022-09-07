@@ -25,7 +25,7 @@ namespace com.ambassador.support.Test.Controller
         //    _mockService = new MockRepository
         //}
 
-        private CustomsReportController GetCustomsReportController(Mock<IExpenditureRawMaterialService> facadeMock,Mock<IReceiptRawMaterialService> facemock2, Mock<IFinishingOutOfGoodService> facemock3, Mock<IWasteScrapService> facemock4)
+        private CustomsReportController GetCustomsReportController(Mock<IExpenditureRawMaterialService> facadeMock,Mock<IReceiptRawMaterialService> facemock2, Mock<IFinishingOutOfGoodService> facemock3, Mock<IWasteScrapService> facemock4,Mock<IWIPInSubconService>facemock5)
         {
             var user = new Mock<ClaimsPrincipal>();
             var claims = new Claim[]
@@ -34,7 +34,7 @@ namespace com.ambassador.support.Test.Controller
             };
             user.Setup(u => u.Claims).Returns(claims);
 
-            CustomsReportController controller = new CustomsReportController(facadeMock.Object, facemock2.Object, facemock3.Object, facemock4.Object);
+            CustomsReportController controller = new CustomsReportController(facadeMock.Object, facemock2.Object, facemock3.Object, facemock4.Object, facemock5.Object);
 
             controller.ControllerContext = new ControllerContext()
             {
@@ -65,9 +65,10 @@ namespace com.ambassador.support.Test.Controller
             var mockFacade2 = new Mock<IReceiptRawMaterialService>();
             var mockFacade3 = new Mock<IFinishingOutOfGoodService>();
             var mockFacade4 = new Mock<IWasteScrapService>();
+            var mockFacade5 = new Mock<IWIPInSubconService>();
 
-            CustomsReportController customsReportController = GetCustomsReportController(mockFacade, mockFacade2, mockFacade3, mockFacade4);
-            var result = customsReportController.GetExpenditureRawMaterial("", DateTimeOffset.Now, DateTimeOffset.Now, 1, 1, "");
+            CustomsReportController customsReportController = GetCustomsReportController(mockFacade, mockFacade2, mockFacade3, mockFacade4, mockFacade5);
+            var result = customsReportController.GetExpenditureRawMaterial( DateTimeOffset.Now, DateTimeOffset.Now, 1, 1, "");
 
             // Assert
             Assert.Equal((int)HttpStatusCode.OK, GetStatusCode(result) );
@@ -84,9 +85,10 @@ namespace com.ambassador.support.Test.Controller
             var mockFacade2 = new Mock<IReceiptRawMaterialService>();
             var mockFacade3 = new Mock<IFinishingOutOfGoodService>();
             var mockFacade4 = new Mock<IWasteScrapService>();
+            var mockFacade5 = new Mock<IWIPInSubconService>();
 
-            CustomsReportController customsReportController = GetCustomsReportController(mockFacade, mockFacade2, mockFacade3, mockFacade4);
-            var result = customsReportController.GetExpenditureRawMaterial("", DateTimeOffset.Now, DateTimeOffset.Now, 1, 1, "");
+            CustomsReportController customsReportController = GetCustomsReportController(mockFacade, mockFacade2, mockFacade3, mockFacade4,mockFacade5);
+            var result = customsReportController.GetExpenditureRawMaterial(DateTimeOffset.Now, DateTimeOffset.Now, 1, 1, "");
 
             // Assert
             Assert.Equal((int)HttpStatusCode.InternalServerError, GetStatusCode(result));
@@ -103,8 +105,9 @@ namespace com.ambassador.support.Test.Controller
             var mockFacade2 = new Mock<IReceiptRawMaterialService>();
             var mockFacade3 = new Mock<IFinishingOutOfGoodService>();
             var mockFacade4 = new Mock<IWasteScrapService>();
+            var mockFacade5 = new Mock<IWIPInSubconService>();
 
-            CustomsReportController customsReportController = GetCustomsReportController(mockFacade, mockFacade2, mockFacade3, mockFacade4);
+            CustomsReportController customsReportController = GetCustomsReportController(mockFacade, mockFacade2, mockFacade3, mockFacade4,mockFacade5);
             var result = customsReportController.GetXlsIN( DateTimeOffset.Now, DateTimeOffset.Now);
 
             // Assert
@@ -123,8 +126,9 @@ namespace com.ambassador.support.Test.Controller
             var mockFacade2 = new Mock<IReceiptRawMaterialService>();
             var mockFacade3 = new Mock<IFinishingOutOfGoodService>();
             var mockFacade4 = new Mock<IWasteScrapService>();
+            var mockFacade5 = new Mock<IWIPInSubconService>();
 
-            CustomsReportController customsReportController = GetCustomsReportController(mockFacade, mockFacade2, mockFacade3, mockFacade4);
+            CustomsReportController customsReportController = GetCustomsReportController(mockFacade, mockFacade2, mockFacade3, mockFacade4,mockFacade5);
             var result = customsReportController.GetXlsIN(DateTimeOffset.Now, DateTimeOffset.Now);
 
             // Assert
@@ -143,8 +147,9 @@ namespace com.ambassador.support.Test.Controller
             var mockFacade2 = new Mock<IExpenditureRawMaterialService>();
             var mockFacade3 = new Mock<IFinishingOutOfGoodService>();
             var mockFacade4 = new Mock<IWasteScrapService>();
+            var mockFacade5 = new Mock<IWIPInSubconService>();
 
-            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade, mockFacade3, mockFacade4);
+            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade, mockFacade3, mockFacade4,mockFacade5);
             var result = customsReportController.GetReceiptRawMaterial(DateTime.Now, DateTime.Now, 1, 1, "");
 
             // Assert
@@ -162,8 +167,9 @@ namespace com.ambassador.support.Test.Controller
             var mockFacade2 = new Mock<IExpenditureRawMaterialService>();
             var mockFacade3 = new Mock<IFinishingOutOfGoodService>();
             var mockFacade4 = new Mock<IWasteScrapService>();
+            var mockFacade5 = new Mock<IWIPInSubconService>();
 
-            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade, mockFacade3, mockFacade4);
+            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade, mockFacade3, mockFacade4,mockFacade5);
             var result = customsReportController.GetReceiptRawMaterial(DateTime.Now, DateTime.Now, 1, 1, "");
 
             // Assert
@@ -181,8 +187,9 @@ namespace com.ambassador.support.Test.Controller
             var mockFacade2 = new Mock<IExpenditureRawMaterialService>();
             var mockFacade3 = new Mock<IFinishingOutOfGoodService>();
             var mockFacade4 = new Mock<IWasteScrapService>();
+            var mockFacade5 = new Mock<IWIPInSubconService>();
 
-            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade, mockFacade3, mockFacade4);
+            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade, mockFacade3, mockFacade4,mockFacade5);
             var result = customsReportController.GetExcelRawMaterial(DateTime.Now, DateTime.Now);
 
             // Assert
@@ -201,8 +208,9 @@ namespace com.ambassador.support.Test.Controller
             var mockFacade2 = new Mock<IExpenditureRawMaterialService>();
             var mockFacade3 = new Mock<IFinishingOutOfGoodService>();
             var mockFacade4 = new Mock<IWasteScrapService>();
+            var mockFacade5 = new Mock<IWIPInSubconService>();
 
-            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade, mockFacade3, mockFacade4);
+            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade, mockFacade3, mockFacade4,mockFacade5);
             var result = customsReportController.GetExcelRawMaterial(DateTime.Now, DateTime.Now);
 
             // Assert
@@ -221,8 +229,9 @@ namespace com.ambassador.support.Test.Controller
             var mockFacade2 = new Mock<IExpenditureRawMaterialService>();
             var mockFacade3 = new Mock<IReceiptRawMaterialService>();
             var mockFacade4 = new Mock<IWasteScrapService>();
+            var mockFacade5 = new Mock<IWIPInSubconService>();
 
-            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade3, mockFacade, mockFacade4);
+            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade3, mockFacade, mockFacade4,mockFacade5);
             var result = customsReportController.GetFinisingOutOfGood(DateTime.Now, DateTime.Now, 1, 1, "");
 
             // Assert
@@ -240,8 +249,9 @@ namespace com.ambassador.support.Test.Controller
             var mockFacade2 = new Mock<IExpenditureRawMaterialService>();
             var mockFacade3 = new Mock<IReceiptRawMaterialService>();
             var mockFacade4 = new Mock<IWasteScrapService>();
+            var mockFacade5 = new Mock<IWIPInSubconService>();
 
-            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade3, mockFacade, mockFacade4);
+            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade3, mockFacade, mockFacade4,mockFacade5);
             var result = customsReportController.GetFinisingOutOfGood(DateTime.Now, DateTime.Now, 1, 1, "");
 
             // Assert
@@ -259,8 +269,9 @@ namespace com.ambassador.support.Test.Controller
             var mockFacade2 = new Mock<IExpenditureRawMaterialService>();
             var mockFacade3 = new Mock<IReceiptRawMaterialService>();
             var mockFacade4 = new Mock<IWasteScrapService>();
+            var mockFacade5 = new Mock<IWIPInSubconService>();
 
-            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade3, mockFacade, mockFacade4);
+            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade3, mockFacade, mockFacade4,mockFacade5);
             var result = customsReportController.GetExcelFinisingOutOfGood(DateTime.Now, DateTime.Now);
 
             // Assert
@@ -279,8 +290,9 @@ namespace com.ambassador.support.Test.Controller
             var mockFacade2 = new Mock<IExpenditureRawMaterialService>();
             var mockFacade3 = new Mock<IReceiptRawMaterialService>();
             var mockFacade4 = new Mock<IWasteScrapService>();
+            var mockFacade5 = new Mock<IWIPInSubconService>();
 
-            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade3, mockFacade, mockFacade4);
+            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade3, mockFacade, mockFacade4,mockFacade5);
             var result = customsReportController.GetExcelFinisingOutOfGood(DateTime.Now, DateTime.Now);
 
             // Assert
@@ -299,8 +311,9 @@ namespace com.ambassador.support.Test.Controller
             var mockFacade2 = new Mock<IExpenditureRawMaterialService>();
             var mockFacade3 = new Mock<IReceiptRawMaterialService>();
             var mockFacade4 = new Mock<IFinishingOutOfGoodService>();
+            var mockFacade5 = new Mock<IWIPInSubconService>();
 
-            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade3, mockFacade4, mockFacade);
+            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade3, mockFacade4, mockFacade,mockFacade5);
             var result = customsReportController.GetWasteScrap(DateTime.Now, DateTime.Now, 1, 1, "");
 
             // Assert
@@ -318,8 +331,9 @@ namespace com.ambassador.support.Test.Controller
             var mockFacade2 = new Mock<IExpenditureRawMaterialService>();
             var mockFacade3 = new Mock<IReceiptRawMaterialService>();
             var mockFacade4 = new Mock<IFinishingOutOfGoodService>();
+            var mockFacade5 = new Mock<IWIPInSubconService>();
 
-            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade3, mockFacade4, mockFacade);
+            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade3, mockFacade4, mockFacade,mockFacade5);
             var result = customsReportController.GetWasteScrap(DateTime.Now, DateTime.Now, 1, 1, "");
 
             // Assert
@@ -337,8 +351,9 @@ namespace com.ambassador.support.Test.Controller
             var mockFacade2 = new Mock<IExpenditureRawMaterialService>();
             var mockFacade3 = new Mock<IReceiptRawMaterialService>();
             var mockFacade4 = new Mock<IFinishingOutOfGoodService>();
+            var mockFacade5 = new Mock<IWIPInSubconService>();
 
-            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade3, mockFacade4, mockFacade);
+            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade3, mockFacade4, mockFacade,mockFacade5);
             var result = customsReportController.GetExcelWasteScrap(DateTime.Now, DateTime.Now);
 
             // Assert
@@ -357,14 +372,96 @@ namespace com.ambassador.support.Test.Controller
             var mockFacade2 = new Mock<IExpenditureRawMaterialService>();
             var mockFacade3 = new Mock<IReceiptRawMaterialService>();
             var mockFacade4 = new Mock<IFinishingOutOfGoodService>();
+            var mockFacade5 = new Mock<IWIPInSubconService>();
 
-            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade3, mockFacade4, mockFacade);
+            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade3, mockFacade4, mockFacade,mockFacade5);
             var result = customsReportController.GetExcelWasteScrap(DateTime.Now, DateTime.Now);
 
             // Assert
             //Assert.Equal((int)HttpStatusCode.OK, GetStatusCode(result));
             Assert.Equal((int)HttpStatusCode.InternalServerError, GetStatusCode(result));
         }
-        //
+
+        [Fact]
+        public async Task GetState_Expect_WIPinSubcon()
+        {
+            // Arrange
+            var mockFacade = new Mock<IWIPInSubconService>();
+            mockFacade.Setup(x => x.GetReport(It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<int>()))
+                .Returns(Tuple.Create(new List<WIPInSubconViewModel>(), 1));
+
+            var mockFacade2 = new Mock<IExpenditureRawMaterialService>();
+            var mockFacade3 = new Mock<IReceiptRawMaterialService>();
+            var mockFacade4 = new Mock<IFinishingOutOfGoodService>();
+            var mockFacade5 = new Mock<IWasteScrapService>();
+
+            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade3, mockFacade4,mockFacade5, mockFacade);
+            var result = customsReportController.GetWipInSubcon(DateTime.Now, DateTime.Now, 1, 1, "");
+
+            // Assert
+            Assert.Equal((int)HttpStatusCode.OK, GetStatusCode(result));
+        }
+
+        [Fact]
+        public async Task GetState_UnExpect_WIPinSubcon()
+        {
+            // Arrange
+            var mockFacade = new Mock<IWIPInSubconService>();
+            //mockFacade.Setup(x => x.GetReport(It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<int>()))
+            //    .Returns(Tuple.Create(new List<WasteScrapViewModel>(), 1));
+
+            var mockFacade2 = new Mock<IExpenditureRawMaterialService>();
+            var mockFacade3 = new Mock<IReceiptRawMaterialService>();
+            var mockFacade4 = new Mock<IFinishingOutOfGoodService>();
+            var mockFacade5 = new Mock<IWasteScrapService>();
+
+            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade3, mockFacade4, mockFacade5, mockFacade);
+            var result = customsReportController.GetWipInSubcon(DateTime.Now, DateTime.Now, 1, 1, "");
+
+            // Assert
+            Assert.Equal((int)HttpStatusCode.InternalServerError, GetStatusCode(result));
+        }
+
+        [Fact]
+        public async Task GetState_Expect_WIPinSubconXls()
+        {
+            // Arrange
+            var mockFacade = new Mock<IWIPInSubconService>();
+            mockFacade.Setup(x => x.GenerateExcel(It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(), It.IsAny<int>()))
+                .Returns(new MemoryStream());
+
+            var mockFacade2 = new Mock<IExpenditureRawMaterialService>();
+            var mockFacade3 = new Mock<IReceiptRawMaterialService>();
+            var mockFacade4 = new Mock<IFinishingOutOfGoodService>();
+            var mockFacade5 = new Mock<IWasteScrapService>();
+
+            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade3, mockFacade4, mockFacade5, mockFacade);
+            var result = customsReportController.GetXlsWipInSubcon(DateTime.Now, DateTime.Now);
+
+            // Assert
+            //Assert.Equal((int)HttpStatusCode.OK, GetStatusCode(result));
+            Assert.Equal("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", result.GetType().GetProperty("ContentType").GetValue(result, null));
+        }
+
+        [Fact]
+        public async Task GetState_UnExpect_WIPinSubconXls()
+        {
+            // Arrange
+            var mockFacade = new Mock<IWIPInSubconService>();
+            //mockFacade.Setup(x => x.GenerateExcel(It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(), It.IsAny<int>()))
+            //    .Returns(new MemoryStream());
+
+            var mockFacade2 = new Mock<IExpenditureRawMaterialService>();
+            var mockFacade3 = new Mock<IReceiptRawMaterialService>();
+            var mockFacade4 = new Mock<IFinishingOutOfGoodService>();
+            var mockFacade5 = new Mock<IWasteScrapService>();
+
+            CustomsReportController customsReportController = GetCustomsReportController(mockFacade2, mockFacade3, mockFacade4, mockFacade5, mockFacade);
+            var result = customsReportController.GetXlsWipInSubcon(DateTime.Now, DateTime.Now);
+
+            // Assert
+            //Assert.Equal((int)HttpStatusCode.OK, GetStatusCode(result));
+            Assert.Equal((int)HttpStatusCode.InternalServerError, GetStatusCode(result));
+        }
     }
 }
