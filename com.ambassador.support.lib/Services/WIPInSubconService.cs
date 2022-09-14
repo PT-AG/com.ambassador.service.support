@@ -37,12 +37,13 @@ namespace com.ambassador.support.lib.Services
                     conn.Open();
                     using (SqlCommand cmd = new SqlCommand(
                         "declare @StartDate datetimeoffset = '" + d1 + "' declare @EndDate datetimeoffset = '" + d2 + "' " +
-                        "SELECT a.UENNo,convert(date,dateadd(hour,7,a.ExpenditureDate)) as 'Tanggal Keluar',b.ProductCode,b.ProductName,b.UomUnit,b.Quantity FROM GarmentUnitExpenditureNotes a " +
+                        "SELECT a.UENNo,convert(date,dateadd(hour,7,a.ExpenditureDate)) as 'Tanggal Keluar',b.ProductCode,b.ProductName,b.UomUnit,b.Quantity,c.SupplierReceiptName FROM GarmentUnitExpenditureNotes a " +
                         "join GarmentUnitExpenditureNoteItems b on a.Id = b.UENId " +
+                        "join GarmentUnitDeliveryOrders c on a.UnitDOId = c.Id " +
                         "where a.ExpenditureType = 'SUBCON' and DATEADD(HOUR,7,a.CreatedUtc) between @StartDate and @EndDate", conn))
 
                     {
-
+                        
                         SqlDataAdapter dataAdapter = new SqlDataAdapter(cmd);
                         DataSet dSet = new DataSet();
                         dataAdapter.Fill(dSet);
@@ -56,7 +57,7 @@ namespace com.ambassador.support.lib.Services
                                 ProductName = data["ProductName"].ToString(),
                                 UomUnit = data["UomUnit"].ToString(),
                                 QuantitySubcon = (double)data["Quantity"],
-                                SupplierName = "-"
+                                SupplierName = data["SupplierReceiptName"].ToString(),
                             };
 
                             reportData.Add(view);
