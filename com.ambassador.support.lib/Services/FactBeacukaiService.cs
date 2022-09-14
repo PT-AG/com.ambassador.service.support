@@ -19,10 +19,11 @@ using OfficeOpenXml;
 using System.Linq.Dynamic.Core;
 using System.Reflection;
 using System.Data.SqlClient;
+using com.ambassador.support.lib.Interfaces;
 
 namespace com.ambassador.support.lib.Services
 {
-    public class FactBeacukaiService 
+    public class FactBeacukaiService : IFactBeacukaiService
     {
         SupportDbContext context;
         public FactBeacukaiService(SupportDbContext _context)

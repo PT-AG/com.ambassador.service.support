@@ -19,7 +19,7 @@ namespace com.ambassador.support.webapi.Controllers.v1
 	{
 		private static readonly string ApiVersion = "1.0";
 		private ScrapService scrapService { get; }
-        private FactBeacukaiService factBeacukaiService { get; }
+        //private FactBeacukaiService factBeacukaiService { get; }
         private FactItemMutationService factItemMutationService { get; }
         private WIPService wipService { get; }
 		private FinishedGoodService finishedGoodService { get; }
@@ -33,9 +33,11 @@ namespace com.ambassador.support.webapi.Controllers.v1
         private readonly IFinishingOutOfGoodService finishingOutOfGoodService;
         private readonly IWasteScrapService wasteScrapService;
         private readonly IWIPInSubconService wIPInSubconService;
+        private readonly IFactBeacukaiService factBeacukaiService;
 
 
-        public CustomsReportController(IExpenditureRawMaterialService expenditureRawMaterialService, IReceiptRawMaterialService receiptRawMaterialService, IFinishingOutOfGoodService finishingOutOfGoodService, IWasteScrapService wasteScrapService, IWIPInSubconService wIPInSubconService, FactBeacukaiService factBeacukaiService )
+
+        public CustomsReportController(IExpenditureRawMaterialService expenditureRawMaterialService, IReceiptRawMaterialService receiptRawMaterialService, IFinishingOutOfGoodService finishingOutOfGoodService, IWasteScrapService wasteScrapService, IWIPInSubconService wIPInSubconService, IFactBeacukaiService factBeacukaiService )
         {
 			this.scrapService = scrapService;
             this.factBeacukaiService = factBeacukaiService;

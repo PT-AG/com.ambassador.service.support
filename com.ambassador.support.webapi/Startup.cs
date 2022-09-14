@@ -52,7 +52,7 @@ namespace com.ambassador.support.webapi
                 });
             services.AddTransient<ILocalDbProductionDBContext>(s => new LocalDbProductionDBContext(LocalDbConnectionString));
             services
-                .AddTransient<FactBeacukaiService>();
+                .AddTransient<IFactBeacukaiService,FactBeacukaiService>();
 			services
 				.AddTransient<ScrapService>();
             services
