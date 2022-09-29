@@ -15,8 +15,8 @@ namespace com.ambassador.support.lib.Services
 {
     public class ExpenditureRawMaterialService : IExpenditureRawMaterialService
     {
-        SupportDbContext context;
-        public ExpenditureRawMaterialService(SupportDbContext _context)
+        PurchasingDBContext context;
+        public ExpenditureRawMaterialService(PurchasingDBContext _context)
         {
             this.context = _context;
         }
@@ -32,7 +32,7 @@ namespace com.ambassador.support.lib.Services
 
             try
             {
-                string connectionString = APIEndpoint.ConnectionString;
+                string connectionString = APIEndpoint.PurchasingConnectionString;
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
