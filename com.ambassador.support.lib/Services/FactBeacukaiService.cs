@@ -19,10 +19,11 @@ using OfficeOpenXml;
 using System.Linq.Dynamic.Core;
 using System.Reflection;
 using System.Data.SqlClient;
+using com.ambassador.support.lib.Interfaces;
 
 namespace com.ambassador.support.lib.Services
 {
-    public class FactBeacukaiService 
+    public class FactBeacukaiService : IFactBeacukaiService
     {
         SupportDbContext context;
         public FactBeacukaiService(SupportDbContext _context)
@@ -558,11 +559,11 @@ namespace com.ambassador.support.lib.Services
 		}
 
 
-        public List<ViewFactBeacukai> GetBEACUKAI_ADDEDs(string invoice)
+        public List<PEBforExpenditureViewModel> GetBEACUKAI_ADDEDs(string invoice)
         {
             var invoices = invoice.Split(",").ToArray();
             string connectionString = APIEndpoint.ConnectionString;
-            string cmdText = "Select a.BCNo, a.BCDate, a.ExpenditureDate, b.Quantity, b.ItemCode, b.ItemName, a.ExpenditureNo FROM BEACUKAI_ADDED a JOIN BEACUKAI_ADDED_DETAIL b on a.BCId = b.BCId WHERE a.ExpenditureNo IN ({0})";
+            string cmdText = "Select a.BCNo, a.BCDate, a.ExpenditureDate, b.Quantity, b.ItemCode, b.ItemName, a.ExpenditureNo,b.CurrencyCode,a.Country,b.Price FROM BEACUKAI_ADDED a JOIN BEACUKAI_ADDED_DETAIL b on a.BCId = b.BCId WHERE a.ExpenditureNo IN ({0})";
 
             //string command = string.Format(cmdText, inClause);
 
@@ -578,7 +579,7 @@ namespace com.ambassador.support.lib.Services
 
 
 
-            List<ViewFactBeacukai> data = new List<ViewFactBeacukai>();
+            List<PEBforExpenditureViewModel> data = new List<PEBforExpenditureViewModel>();
 
             if (parameters.Count > 0)
             {
@@ -603,14 +604,17 @@ namespace com.ambassador.support.lib.Services
                         dataAdapter.Fill(dSet);
                         foreach (DataRow dataRow in dSet.Tables[0].Rows)
                         {
-                            ViewFactBeacukai trace = new ViewFactBeacukai
+                            PEBforExpenditureViewModel trace = new PEBforExpenditureViewModel
                             {
                                 BCNo = dataRow["BCNo"].ToString(),
                                 BonDate = Convert.ToDateTime(dataRow["ExpenditureDate"].ToString()),
                                 BCDate = Convert.ToDateTime(dataRow["BCDate"].ToString()),
                                 Quantity = (double)dataRow["Quantity"],
                                 BonNo = dataRow["ExpenditureNo"].ToString(),
-                                ItemCode = dataRow["ItemCode"].ToString()
+                                ItemCode = dataRow["ItemCode"].ToString(),
+                                CurrencyCode = dataRow["CurrencyCode"].ToString(),
+                                Country = dataRow["Country"].ToString(),
+                                Nominal = (decimal)dataRow["Price"],
                             };
 
                             data.Add(trace);
