@@ -14,8 +14,8 @@ namespace com.ambassador.support.lib.Services
 {
     public class ExpenditureGoodsService
     {
-        SupportDbContext context;
-        public ExpenditureGoodsService(SupportDbContext _context)
+        ProductionDBContext context;
+        public ExpenditureGoodsService(ProductionDBContext _context)
         {
             this.context = _context;
         }
@@ -32,7 +32,7 @@ namespace com.ambassador.support.lib.Services
 
             try
             {
-                string connectionString = APIEndpoint.LocalConnectionString;
+                string connectionString = APIEndpoint.ProductionConnectionString;
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();

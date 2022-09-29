@@ -15,8 +15,8 @@ namespace com.ambassador.support.lib.Services
 {
     public class WIPInSubconService : IWIPInSubconService
     {
-        SupportDbContext context;
-        public WIPInSubconService(SupportDbContext _context)
+        PurchasingDBContext context;
+        public WIPInSubconService(PurchasingDBContext _context)
         {
             this.context = _context;
         }
@@ -31,7 +31,7 @@ namespace com.ambassador.support.lib.Services
             List<WIPInSubconViewModel> reportData = new List<WIPInSubconViewModel>();
             try
             {
-                string connectionString = APIEndpoint.ConnectionString;
+                string connectionString = APIEndpoint.PurchasingConnectionString;
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();

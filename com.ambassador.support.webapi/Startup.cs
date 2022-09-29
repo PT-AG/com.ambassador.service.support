@@ -39,11 +39,16 @@ namespace com.ambassador.support.webapi
         {
             string connectionString = Configuration.GetConnectionString("DefaultConnection") ?? Configuration["DefaultConnection"];
 			string LocalDbConnectionString = Configuration.GetConnectionString("LocalDbProductionConnection") ?? Configuration["LocalDbProductionConnection"];
-			APIEndpoint.ConnectionString = Configuration.GetConnectionString("DefaultConnection") ?? Configuration["DefaultConnection"];
+            string PurchasingConnectionString = Configuration.GetConnectionString("PurchasingConnection") ?? Configuration["PurchasingConnection"];
+            string ProductionConnectionString = Configuration.GetConnectionString("ProductionConnection") ?? Configuration["ProductionConnection"];
+
+            APIEndpoint.ConnectionString = Configuration.GetConnectionString("DefaultConnection") ?? Configuration["DefaultConnection"];
             APIEndpoint.LocalConnectionString = Configuration.GetConnectionString("LocalDbProductionConnection") ?? Configuration["LocalDbProductionConnection"];
+            APIEndpoint.PurchasingConnectionString = Configuration.GetConnectionString("PurchasingConnection") ?? Configuration["PurchasingConnection"];
+            APIEndpoint.ProductionConnectionString = Configuration.GetConnectionString("ProductionConnection") ?? Configuration["ProductionConnection"];
 
             services
-				.AddDbContext<SupportDbContext>(options => options.UseSqlServer(connectionString))
+                .AddDbContext<SupportDbContext>(options => options.UseSqlServer(connectionString))
 				.AddApiVersioning(options =>
                 {
                     options.ReportApiVersions = true;
@@ -51,6 +56,8 @@ namespace com.ambassador.support.webapi
                     options.DefaultApiVersion = new ApiVersion(1, 0);
                 });
             services.AddTransient<ILocalDbProductionDBContext>(s => new LocalDbProductionDBContext(LocalDbConnectionString));
+            services.AddTransient<IPurchasingDBContext>(s => new PurchasingDBContext(PurchasingConnectionString));
+            services.AddTransient<IProductionDBContext>(s => new ProductionDBContext(ProductionConnectionString));
             services
                 .AddTransient<IFactBeacukaiService,FactBeacukaiService>();
 			services

@@ -15,8 +15,8 @@ namespace com.ambassador.support.lib.Services
 {
     public class FinishingOutOfGoodService : IFinishingOutOfGoodService
     {
-        SupportDbContext context;
-        public FinishingOutOfGoodService(SupportDbContext _context)
+        ProductionDBContext context;
+        public FinishingOutOfGoodService(ProductionDBContext _context)
         {
             this.context = _context;
         }
@@ -29,7 +29,7 @@ namespace com.ambassador.support.lib.Services
 
             try
             {
-                string connectionString = APIEndpoint.ConnectionString;
+                string connectionString = APIEndpoint.ProductionConnectionString;
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
