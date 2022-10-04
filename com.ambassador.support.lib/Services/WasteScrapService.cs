@@ -15,8 +15,8 @@ namespace com.ambassador.support.lib.Services
 {
     public class WasteScrapService : IWasteScrapService
     {
-        ProductionDBContext context;
-        public WasteScrapService(ProductionDBContext _context)
+        IProductionDBContext context;
+        public WasteScrapService(IProductionDBContext _context)
         {
             this.context = _context;
         }

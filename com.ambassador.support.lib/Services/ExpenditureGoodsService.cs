@@ -14,8 +14,8 @@ namespace com.ambassador.support.lib.Services
 {
     public class ExpenditureGoodsService
     {
-        ProductionDBContext context;
-        public ExpenditureGoodsService(ProductionDBContext _context)
+        IProductionDBContext context;
+        public ExpenditureGoodsService(IProductionDBContext _context)
         {
             this.context = _context;
         }
