@@ -13,6 +13,6 @@ namespace com.ambassador.support.lib.Helpers
         public static string LocalConnectionString { get; set; }
         public static string PurchasingConnectionString { get; set; }
         public static string ProductionConnectionString { get; set; }
-        public static string Production { get; set; }
+        //public static string Production { get; set; }
     }
 }

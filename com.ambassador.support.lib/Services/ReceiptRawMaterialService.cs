@@ -15,8 +15,8 @@ namespace com.ambassador.support.lib.Services
 {
     public class ReceiptRawMaterialService : IReceiptRawMaterialService
     {
-        PurchasingDBContext context;
-        public ReceiptRawMaterialService(PurchasingDBContext _context)
+        IPurchasingDBContext context;
+        public ReceiptRawMaterialService(IPurchasingDBContext _context)
         {
             this.context = _context;
         }
