@@ -24,7 +24,7 @@ namespace com.ambassador.support.lib.Services
         {
             DateTimeOffset d1 = dateFrom.Value.AddHours(offset);
             DateTimeOffset d2 = dateTo.Value.AddHours(offset);
-
+            var customCategory = "Fasilitas";
             //string DateFrom = d1.ToString("yyyy-MM-dd");
             //string DateTo = d2.ToString("yyyy-MM-dd");
 
@@ -40,7 +40,10 @@ namespace com.ambassador.support.lib.Services
                         "SELECT a.UENNo,convert(date,dateadd(hour,7,a.ExpenditureDate)) as 'Tanggal Keluar',b.ProductCode,b.ProductName,b.UomUnit,b.Quantity,c.SupplierReceiptName FROM GarmentUnitExpenditureNotes a " +
                         "join GarmentUnitExpenditureNoteItems b on a.Id = b.UENId " +
                         "join GarmentUnitDeliveryOrders c on a.UnitDOId = c.Id " +
-                        "where a.ExpenditureType = 'SUBCON' and DATEADD(HOUR,7,a.CreatedUtc) between @StartDate and @EndDate", conn))
+                        "join GarmentUnitDeliveryOrderItems d on c.Id = d.UnitDOId " +
+                        "join GarmentUnitReceiptNoteItems e on d.URNItemId = e.Id " +
+                        "where a.ExpenditureType = 'SUBCON' and DATEADD(HOUR,7,a.CreatedUtc) between @StartDate and @EndDate and e.CustomsCategory='"+ customCategory +"' " +
+                        "and a.IsDeleted=0 and b.IsDeleted=0 and c.IsDeleted=0 and d.IsDeleted=0 and e.IsDeleted=0 ", conn))
 
                     {
                         
