@@ -15,8 +15,8 @@ namespace com.ambassador.support.lib.Services
 {
     public class ExpenditureRawMaterialService : IExpenditureRawMaterialService
     {
-        PurchasingDBContext context;
-        public ExpenditureRawMaterialService(PurchasingDBContext _context)
+        IPurchasingDBContext context;
+        public ExpenditureRawMaterialService(IPurchasingDBContext _context)
         {
             this.context = _context;
         }

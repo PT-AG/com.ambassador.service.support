@@ -563,7 +563,7 @@ namespace com.ambassador.support.lib.Services
         {
             var invoices = invoice.Split(",").ToArray();
             string connectionString = APIEndpoint.ConnectionString;
-            string cmdText = "Select a.BCNo, a.BCDate, a.ExpenditureDate, b.Quantity, b.ItemCode, b.ItemName, a.ExpenditureNo,b.CurrencyCode,a.Country,b.Price FROM BEACUKAI_ADDED a JOIN BEACUKAI_ADDED_DETAIL b on a.BCId = b.BCId WHERE a.ExpenditureNo IN ({0})";
+            string cmdText = "Select a.BCNo, a.BCDate, a.ExpenditureDate, b.Quantity, b.ItemCode, b.ItemName, a.ExpenditureNo,b.CurrencyCode,b.Price FROM BEACUKAI_ADDED a JOIN BEACUKAI_ADDED_DETAIL b on a.BCId = b.BCId WHERE a.ExpenditureNo IN ({0})";
 
             //string command = string.Format(cmdText, inClause);
 
@@ -613,7 +613,7 @@ namespace com.ambassador.support.lib.Services
                                 BonNo = dataRow["ExpenditureNo"].ToString(),
                                 ItemCode = dataRow["ItemCode"].ToString(),
                                 CurrencyCode = dataRow["CurrencyCode"].ToString(),
-                                Country = dataRow["Country"].ToString(),
+                                //Country = dataRow["Country"].ToString(),
                                 Nominal = (decimal)dataRow["Price"],
                             };
 

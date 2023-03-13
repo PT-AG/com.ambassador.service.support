@@ -15,8 +15,8 @@ namespace com.ambassador.support.lib.Services
 {
     public class WIPInSubconService : IWIPInSubconService
     {
-        PurchasingDBContext context;
-        public WIPInSubconService(PurchasingDBContext _context)
+        IPurchasingDBContext context;
+        public WIPInSubconService(IPurchasingDBContext _context)
         {
             this.context = _context;
         }

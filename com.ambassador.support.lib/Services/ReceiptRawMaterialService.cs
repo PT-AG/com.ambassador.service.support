@@ -15,8 +15,8 @@ namespace com.ambassador.support.lib.Services
 {
     public class ReceiptRawMaterialService : IReceiptRawMaterialService
     {
-        PurchasingDBContext context;
-        public ReceiptRawMaterialService(PurchasingDBContext _context)
+        IPurchasingDBContext context;
+        public ReceiptRawMaterialService(IPurchasingDBContext _context)
         {
             this.context = _context;
         }
@@ -37,7 +37,7 @@ namespace com.ambassador.support.lib.Services
                     conn.Open();
                     using (SqlCommand cmd = new SqlCommand(
                         "declare @StartDate datetime = '" + d1 + "' declare @EndDate datetime = '" + d2 + "' " +
-                        "select e.CustomsType,e.BeacukaiNo,convert(date,dateadd(hour,7,e.BeacukaiDate)) as BCDate,f.URNNo,convert(date,dateadd(hour,7,f.ReceiptDate)) as URNDate,g.ProductCode,g.ProductName," +
+                        "select distinct e.CustomsType,e.BeacukaiNo,convert(date,dateadd(hour,7,e.BeacukaiDate)) as BCDate,f.URNNo,convert(date,dateadd(hour,7,f.ReceiptDate)) as URNDate,g.ProductCode,g.ProductName," +
                         "g.SmallQuantity,g.SmallUomUnit,a.DOCurrencyCode,cast((g.PricePerDealUnit * g.SmallQuantity * g.DOCurrencyRate) as decimal(18,2)) as Amount,a.SupplierName,a.Country " +
                         "from GarmentDeliveryOrders a join GarmentDeliveryOrderItems b on a.id=b.GarmentDOId join GarmentDeliveryOrderDetails c on b.id=c.GarmentDOItemId " +
                         "join GarmentBeacukaiItems d on d.GarmentDOId=a.id join GarmentBeacukais e on e.id=d.BeacukaiId " +

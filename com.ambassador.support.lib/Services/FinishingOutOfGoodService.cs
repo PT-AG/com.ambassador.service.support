@@ -15,8 +15,8 @@ namespace com.ambassador.support.lib.Services
 {
     public class FinishingOutOfGoodService : IFinishingOutOfGoodService
     {
-        ProductionDBContext context;
-        public FinishingOutOfGoodService(ProductionDBContext _context)
+        IProductionDBContext context;
+        public FinishingOutOfGoodService(IProductionDBContext _context)
         {
             this.context = _context;
         }
