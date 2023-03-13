@@ -24,7 +24,9 @@ namespace com.ambassador.support.lib.Services
         {
             var d1 = dateFrom.Value.ToString("yyyy-MM-dd");
             var d2 = dateTo.Value.ToString("yyyy-MM-dd");
-         
+            var customCategory = "Fasilitas";
+
+
             List<ReceiptRawMaterialViewModel> reportData = new List<ReceiptRawMaterialViewModel>();
 
             try
@@ -40,7 +42,8 @@ namespace com.ambassador.support.lib.Services
                         "from GarmentDeliveryOrders a join GarmentDeliveryOrderItems b on a.id=b.GarmentDOId join GarmentDeliveryOrderDetails c on b.id=c.GarmentDOItemId " +
                         "join GarmentBeacukaiItems d on d.GarmentDOId=a.id join GarmentBeacukais e on e.id=d.BeacukaiId " +
                         "join GarmentUnitReceiptNotes f on a.id=f.DOId join GarmentUnitReceiptNoteItems g on f.id=g.URNId " +
-                        "where e.BeacukaiDate between @StartDate and @EndDate", conn))
+                        "where e.BeacukaiDate between @StartDate and @EndDate and a.CustomsCategory = '"+ customCategory + "'" +
+                        "and a.IsDeleted=0 and b.IsDeleted=0 and c.IsDeleted=0 and d.IsDeleted=0 and e.IsDeleted=0 and f.IsDeleted=0 and g.IsDeleted=0", conn))
 
                     {
                         SqlDataAdapter dataAdapter = new SqlDataAdapter(cmd);
