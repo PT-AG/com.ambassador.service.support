@@ -37,7 +37,9 @@ namespace com.ambassador.support.lib.Services
                         "declare @StartDate datetime = '" + d1 + "' declare @EndDate datetime = '" + d2 + "' " +
                         "select a.FinishingOutNo,convert(date,dateadd(hour,7,a.FinishingOutDate)) as FODate,a.ComodityCode,a.ComodityName,b.Quantity,b.UomUnit,c.FinishingInType from GarmentFinishingOuts a  " +
                         "join GarmentFinishingOutItems b on a.[Identity] = b.FinishingOutId join GarmentFinishingIns c on b.FinishingInId=c.[Identity] " +
-                        "where a.FinishingTo='GUDANG JADI' and  a.CreatedDate between @StartDate and @EndDate", conn))
+                        "join GarmentPreparings d on a.RONo =d.RONo " +
+                        "join GarmentPreparingItems e on d.[Identity] = e.GarmentPreparingId " +
+                        "where a.FinishingTo='GUDANG JADI' and e.CustomsCategory='FASILITAS' and  a.CreatedDate between @StartDate and @EndDate", conn))
                     {
                         SqlDataAdapter dataAdapter = new SqlDataAdapter(cmd);
                         DataSet dSet = new DataSet();
