@@ -42,7 +42,7 @@ namespace com.ambassador.support.lib.Services
                         "join GarmentUnitDeliveryOrders c on a.UnitDOId = c.Id " +
                         "join GarmentUnitDeliveryOrderItems d on c.Id = d.UnitDOId " +
                         "join GarmentUnitReceiptNoteItems e on d.URNItemId = e.Id " +
-                        "where a.ExpenditureType = 'SUBCON' and DATEADD(HOUR,7,a.CreatedUtc) between @StartDate and @EndDate and e.CustomsCategory='"+ customCategory +"' " +
+                        "where a.ExpenditureType = 'SUBCON' and DATEADD(HOUR,7,a.ExpenditureDate) between @StartDate and @EndDate and e.CustomsCategory='" + customCategory +"' " +
                         "and a.IsDeleted=0 and b.IsDeleted=0 and c.IsDeleted=0 and d.IsDeleted=0 and e.IsDeleted=0 ", conn))
 
                     {
