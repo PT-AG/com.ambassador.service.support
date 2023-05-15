@@ -39,7 +39,7 @@ namespace com.ambassador.support.lib.Services
                         "join GarmentFinishingOutItems b on a.[Identity] = b.FinishingOutId join GarmentFinishingIns c on b.FinishingInId=c.[Identity] " +
                         "join GarmentPreparings d on a.RONo =d.RONo " +
                         "join GarmentPreparingItems e on d.[Identity] = e.GarmentPreparingId " +
-                        "where a.FinishingTo='GUDANG JADI' and e.CustomsCategory='FASILITAS' and  DATEADD(HOUR,7,a.FinishingOutDate) between @StartDate and @EndDate " +
+                        "where a.Deleted=0 and a.FinishingTo='GUDANG JADI' and e.CustomsCategory='FASILITAS' and  DATEADD(HOUR,7,a.FinishingOutDate) between @StartDate and @EndDate " +
                         "group by a.FinishingOutNo, a.FinishingOutDate, a.ComodityCode,a.ComodityName,b.UomUnit,c.FinishingInType ", conn))
                     {
                         SqlDataAdapter dataAdapter = new SqlDataAdapter(cmd);
