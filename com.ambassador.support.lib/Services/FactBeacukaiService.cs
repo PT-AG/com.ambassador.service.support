@@ -623,7 +623,22 @@ namespace com.ambassador.support.lib.Services
                     }
                 }
             }
-            return data;
+
+            var sumData = data.GroupBy(x => new { x.BCNo, x.BonDate, x.BCDate, x.BonNo, x.ItemCode, x.CurrencyCode, x.Country, x.BuyerName }, (key, group) => new PEBforExpenditureViewModel
+            {
+                BCNo = key.BCNo,
+                BonDate = key.BonDate,
+                BCDate = key.BCDate,
+                BonNo = key.BonNo,
+                ItemCode = key.ItemCode,
+                CurrencyCode = key.CurrencyCode,
+                Country = key.Country,
+                BuyerName = key.BuyerName,
+                Quantity = group.Sum(x => x.Quantity),
+                Nominal = (decimal)group.Sum(x => x.Quantity) * group.Sum(x => x.Nominal)
+
+            }).ToList();
+            return sumData;
         }
 
         public List<ViewFactBeacukai> GetBEACUKAI_ADDEDbyBCNo(string bcno)
