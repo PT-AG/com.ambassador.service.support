@@ -614,7 +614,7 @@ namespace com.ambassador.support.lib.Services
                                 ItemCode = dataRow["ItemCode"].ToString(),
                                 CurrencyCode = dataRow["CurrencyCode"].ToString(),
                                 Country = dataRow["Country"].ToString(),
-                                Nominal = (decimal)dataRow["Price"],
+                                Nominal = ((decimal)dataRow["Price"] * Convert.ToDecimal((double)dataRow["Quantity"])),
                                 BuyerName = dataRow["BuyerName"].ToString(),
                             };
 
@@ -635,7 +635,7 @@ namespace com.ambassador.support.lib.Services
                 Country = key.Country,
                 BuyerName = key.BuyerName,
                 Quantity = group.Sum(x => x.Quantity),
-                Nominal = (decimal)group.Sum(x => x.Quantity) * group.Sum(x => x.Nominal)
+                Nominal =  group.Sum(x => x.Nominal)
 
             }).ToList();
             return sumData;
