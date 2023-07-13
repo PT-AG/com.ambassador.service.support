@@ -1171,32 +1171,32 @@ namespace com.ambassador.support.webapi.Controllers.v1
         //      }
 
 
-        //      [HttpGet("getPEB/byBCNo")]
-        //      public IActionResult GetPEBBCNo(string bcno)
-        //      {
-        //          int offset = Convert.ToInt32(Request.Headers["x-timezone-offset"]);
-        //          string accept = Request.Headers["Accept"];
+        [HttpGet("getPEB/byBCNo")]
+        public IActionResult GetPEBBCNo(string bcno)
+        {
+            int offset = Convert.ToInt32(Request.Headers["x-timezone-offset"]);
+            string accept = Request.Headers["Accept"];
 
-        //          try
-        //          {
+            try
+            {
 
-        //              var data = factBeacukaiService.GetBEACUKAI_ADDEDbyBCNo(bcno);
+                var data = factBeacukaiService.GetBEACUKAI_ADDEDbyBCNo(bcno);
 
-        //              return Ok(new
-        //              {
-        //                  apiVersion = ApiVersion,
-        //                  data = data,
-        //                  info = new { total = 1 }
-        //              });
-        //          }
-        //          catch (Exception e)
-        //          {
-        //              Dictionary<string, object> Result =
-        //                  new ResultFormatter(ApiVersion, General.INTERNAL_ERROR_STATUS_CODE, e.Message)
-        //                  .Fail();
-        //              return StatusCode(General.INTERNAL_ERROR_STATUS_CODE, Result);
-        //          }
-        //      }
+                return Ok(new
+                {
+                    apiVersion = ApiVersion,
+                    data = data,
+                    info = new { total = 1 }
+                });
+            }
+            catch (Exception e)
+            {
+                Dictionary<string, object> Result =
+                    new ResultFormatter(ApiVersion, General.INTERNAL_ERROR_STATUS_CODE, e.Message)
+                    .Fail();
+                return StatusCode(General.INTERNAL_ERROR_STATUS_CODE, Result);
+            }
+        }
 
         //      [HttpGet("getPEB/byDate")]
         //      public IActionResult GetPEBDate(DateTime? dateFrom, DateTime? dateTo)
