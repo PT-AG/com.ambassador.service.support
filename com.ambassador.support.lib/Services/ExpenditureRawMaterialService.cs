@@ -45,7 +45,7 @@ namespace com.ambassador.support.lib.Services
                         "left join GarmentDOItems h on h.URNItemId=g.Id " +
                         "left join GarmentUnitDeliveryOrderItems i on i.DOItemsId=h.Id join GarmentUnitDeliveryOrders j on j.id=i.UnitDOId " +
                         "left join GarmentUnitExpenditureNoteItems k on k.UnitDOItemId=i.Id join GarmentUnitExpenditureNotes l on l.id=k.UENId " +
-                        "where DATEADD(HOUR,7,l.ExpenditureDate) between @StartDate and @EndDate and a.CustomsCategory='" + customCategory+"' " +
+                        "where DATEADD(HOUR,7,l.CreatedUtc) between @StartDate and @EndDate and a.CustomsCategory='" + customCategory+"' " +
                         "and a.IsDeleted=0 and b.IsDeleted=0 and c.IsDeleted=0 and d.IsDeleted=0 and e.IsDeleted=0 and f.IsDeleted=0 and g.IsDeleted=0 and h.IsDeleted=0 and i.IsDeleted=0 and j.IsDeleted=0 and k.IsDeleted=0 and l.IsDeleted=0", conn))
 
                     {
