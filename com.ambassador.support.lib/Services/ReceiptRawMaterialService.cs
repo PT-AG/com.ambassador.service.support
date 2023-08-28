@@ -66,7 +66,7 @@ namespace com.ambassador.support.lib.Services
                                 DOCurrencyCode = data["DOCurrencyCode"].ToString(),
                                 Amount = (decimal)data["Amount"],
                                 StorageName = "GUDANG AG2",
-                                SupplierName = data["SupplierName"].ToString(),
+                                SupplierName = "-",
                                 Country = data["Country"].ToString()
                             };
                             reportData.Add(view);
