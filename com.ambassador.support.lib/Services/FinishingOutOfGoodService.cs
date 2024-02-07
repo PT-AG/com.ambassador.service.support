@@ -35,12 +35,13 @@ namespace com.ambassador.support.lib.Services
                     conn.Open();
                     using (SqlCommand cmd = new SqlCommand(
                         "declare @StartDate datetime = '" + d1 + "' declare @EndDate datetime = '" + d2 + "' " +
-                        "select a.FinishingOutNo,convert(date,dateadd(hour,7,a.FinishingOutDate)) as FODate,a.ComodityCode,a.ComodityName,sum(b.Quantity) as Quantity,b.UomUnit,c.FinishingInType from GarmentFinishingOuts a  " +
-                        "join GarmentFinishingOutItems b on a.[Identity] = b.FinishingOutId join GarmentFinishingIns c on b.FinishingInId=c.[Identity] " +
-                        "join GarmentPreparings d on a.RONo =d.RONo " +
+                        "select FinishingOutNo, FODate,ComodityCode,ComodityName,sum(Quantity) as Quantity ,UomUnit,FinishingInType from ( " +
+                        "select distinct a.FinishingOutNo, convert(date, dateadd(hour, 7, a.FinishingOutDate)) as FODate, a.ComodityCode, a.ComodityName, b.Quantity, b.UomUnit, c.FinishingInType, b.[Identity] from GarmentFinishingOuts a " +
+                        "join GarmentFinishingOutItems b on a.[Identity] = b.FinishingOutId join GarmentFinishingIns c on b.FinishingInId = c.[Identity] " +
+                        "join GarmentPreparings d on a.RONo = d.RONo " +
                         "join GarmentPreparingItems e on d.[Identity] = e.GarmentPreparingId " +
-                        "where a.Deleted=0 and a.FinishingTo='GUDANG JADI' and e.CustomsCategory='FASILITAS' and  DATEADD(HOUR,7,a.FinishingOutDate) between @StartDate and @EndDate " +
-                        "group by a.FinishingOutNo, a.FinishingOutDate, a.ComodityCode,a.ComodityName,b.UomUnit,c.FinishingInType ", conn))
+                        "where a.Deleted = 0 and a.FinishingTo = 'GUDANG JADI' and e.CustomsCategory = 'FASILITAS' and  DATEADD(HOUR, 7, a.FinishingOutDate) between  @StartDate and @EndDate " +
+                        ") as data group by FinishingOutNo, FODate, ComodityCode,ComodityName,UomUnit,FinishingInType ", conn))
                     {
                         SqlDataAdapter dataAdapter = new SqlDataAdapter(cmd);
                         DataSet dSet = new DataSet();
