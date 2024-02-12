@@ -34,10 +34,10 @@ namespace com.ambassador.support.webapi.Controllers.v1
         private readonly IWasteScrapService wasteScrapService;
         private readonly IWIPInSubconService wIPInSubconService;
         private readonly IFactBeacukaiService factBeacukaiService;
+        private IdentityService IdentityService;
 
 
-
-        public CustomsReportController(IExpenditureRawMaterialService expenditureRawMaterialService, IReceiptRawMaterialService receiptRawMaterialService, IFinishingOutOfGoodService finishingOutOfGoodService, IWasteScrapService wasteScrapService, IWIPInSubconService wIPInSubconService, IFactBeacukaiService factBeacukaiService )
+        public CustomsReportController(IExpenditureRawMaterialService expenditureRawMaterialService, IReceiptRawMaterialService receiptRawMaterialService, IFinishingOutOfGoodService finishingOutOfGoodService, IWasteScrapService wasteScrapService, IWIPInSubconService wIPInSubconService, IFactBeacukaiService factBeacukaiService, IdentityService identityService )
         {
 			this.scrapService = scrapService;
             this.factBeacukaiService = factBeacukaiService;
@@ -54,6 +54,7 @@ namespace com.ambassador.support.webapi.Controllers.v1
             this.finishingOutOfGoodService = finishingOutOfGoodService;
             this.wasteScrapService = wasteScrapService;
             this.wIPInSubconService = wIPInSubconService;
+            IdentityService = identityService;
         }
 
         [HttpGet("expenditure-raw-material")]
@@ -113,14 +114,16 @@ namespace com.ambassador.support.webapi.Controllers.v1
         }
 
         [HttpGet("receipt-raw-material")]
-        public IActionResult GetReceiptRawMaterial(DateTime? dateFrom, DateTime? dateTo, int page, int size, string Order = "{}")
+        public async Task<IActionResult> GetReceiptRawMaterial(DateTime? dateFrom, DateTime? dateTo, int page, int size, string Order = "{}")
         {
-            int offset = Convert.ToInt32(Request.Headers["x-timezone-offset"]);
-            string accept = Request.Headers["Accept"];
+            
 
             try
             {
-                var data = receiptRawMaterialService.GetReport(dateFrom, dateTo, page, size, Order);
+                int offset = Convert.ToInt32(Request.Headers["x-timezone-offset"]);
+                string accept = Request.Headers["Accept"];
+                IdentityService.Token = Request.Headers["Authorization"].FirstOrDefault().Replace("Bearer ", "");
+                var data = await receiptRawMaterialService.GetReport(dateFrom, dateTo, page, size, Order);
 
                 return Ok(new
                 {
@@ -139,15 +142,17 @@ namespace com.ambassador.support.webapi.Controllers.v1
         }
 
         [HttpGet("receipt-raw-material/download")]
-        public IActionResult GetExcelRawMaterial(DateTime? dateFrom, DateTime? dateTo)
+        public async Task<IActionResult> GetExcelRawMaterial(DateTime? dateFrom, DateTime? dateTo)
         {
-            int offset = Convert.ToInt32(Request.Headers["x-timezone-offset"]);
-            string accept = Request.Headers["Accept"];
             try
             {
                 byte[] xlsInBytes;
-           
-                var xls = receiptRawMaterialService.GenerateExcel(dateFrom, dateTo);
+
+                int offset = Convert.ToInt32(Request.Headers["x-timezone-offset"]);
+                string accept = Request.Headers["Accept"];
+                IdentityService.Token = Request.Headers["Authorization"].FirstOrDefault().Replace("Bearer ", "");
+
+                var xls = await receiptRawMaterialService.GenerateExcel(dateFrom, dateTo);
 
                 string filename = String.Format("Laporan Pemasukan Bahan Baku - {0}.xlsx", DateTime.UtcNow.ToString("ddMMyyyy"));
 
