@@ -9,18 +9,22 @@ using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace com.ambassador.support.lib.Services
 {
     public class ReceiptRawMaterialService : IReceiptRawMaterialService
     {
-        PurchasingDBContext context;
-        public ReceiptRawMaterialService(PurchasingDBContext _context)
+        IPurchasingDBContext context;
+        public readonly IServiceProvider serviceProvider;
+        public ReceiptRawMaterialService(IPurchasingDBContext _context, IServiceProvider serviceProvider)
         {
             this.context = _context;
+            this.serviceProvider = serviceProvider;
         }
-        public IQueryable<ReceiptRawMaterialViewModel> getQuery(DateTime? dateFrom, DateTime? dateTo)
+        public async Task<IQueryable<ReceiptRawMaterialViewModel>> getQuery(DateTime? dateFrom, DateTime? dateTo)
         {
             var d1 = dateFrom.Value.ToString("yyyy-MM-dd");
             var d2 = dateTo.Value.ToString("yyyy-MM-dd");
@@ -35,8 +39,8 @@ namespace com.ambassador.support.lib.Services
                     conn.Open();
                     using (SqlCommand cmd = new SqlCommand(
                         "declare @StartDate datetime = '" + d1 + "' declare @EndDate datetime = '" + d2 + "' " +
-                        "select e.CustomsType,e.BeacukaiNo,convert(date,dateadd(hour,7,e.BeacukaiDate)) as BCDate,f.URNNo,convert(date,dateadd(hour,7,f.ReceiptDate)) as URNDate,g.ProductCode,g.ProductName," +
-                        "g.SmallQuantity,g.SmallUomUnit,a.DOCurrencyCode,cast((g.PricePerDealUnit * g.SmallQuantity * g.DOCurrencyRate) as decimal(18,2)) as Amount,a.SupplierName,a.Country " +
+                        "select distinct e.CustomsType,e.BeacukaiNo,convert(date,dateadd(hour,7,e.BeacukaiDate)) as BCDate,f.URNNo,convert(date,dateadd(hour,7,f.ReceiptDate)) as URNDate,g.ProductCode,g.ProductName," +
+                        "g.SmallQuantity,g.SmallUomUnit,a.DOCurrencyCode,cast((g.PricePerDealUnit * g.SmallQuantity) as decimal(18,2)) as Amount,a.SupplierName,a.Country, c.ProductSeries " +
                         "from GarmentDeliveryOrders a join GarmentDeliveryOrderItems b on a.id=b.GarmentDOId join GarmentDeliveryOrderDetails c on b.id=c.GarmentDOItemId " +
                         "join GarmentBeacukaiItems d on d.GarmentDOId=a.id join GarmentBeacukais e on e.id=d.BeacukaiId " +
                         "join GarmentUnitReceiptNotes f on a.id=f.DOId join GarmentUnitReceiptNoteItems g on f.id=g.URNId " +
@@ -53,7 +57,7 @@ namespace com.ambassador.support.lib.Services
                                 CustomsType = data["CustomsType"].ToString(),
                                 BeacukaiNo = data["BeacukaiNo"].ToString(),
                                 BeacukaiDate = data["BCDate"].ToString(),
-                                SerialNo = "-",
+                                SerialNo = data["ProductSeries"].ToString(),
                                 URNNo = data["URNNo"].ToString(),
                                 URNDate = data["URNDate"].ToString(),
                                 ProductCode = data["ProductCode"].ToString(),
@@ -75,11 +79,28 @@ namespace com.ambassador.support.lib.Services
             catch (SqlException ex)
             { 
             }
+
+            var Codes = await GetProductCode(string.Join(",", reportData.Select(x => x.ProductCode).Distinct().ToList()));
+
+            foreach(var a in reportData)
+            {
+                var remark = Codes.FirstOrDefault(x => x.Code == a.ProductCode);
+
+                var Composition = remark == null ? "-" : remark.Composition;
+                var Width = remark == null ? "-" : remark.Width;
+                var Const = remark == null ? "-" : remark.Const;
+                var Yarn = remark == null ? "-" : remark.Yarn;
+                var Name = remark == null ? "-" : remark.Name;
+
+                a.ProductName = remark != null ? string.Concat(a.ProductName, " - ",Composition, "", Width, "", Const, "", Yarn) : a.ProductName;
+
+            }
+
             return reportData.AsQueryable();
         }
-        public Tuple<List<ReceiptRawMaterialViewModel>, int> GetReport(DateTime? dateFrom, DateTime? dateTo, int page, int size, string Order)
+        public async Task<Tuple<List<ReceiptRawMaterialViewModel>, int>> GetReport(DateTime? dateFrom, DateTime? dateTo, int page, int size, string Order)
         {
-            var Query = getQuery(dateFrom, dateTo);
+            var Query = await getQuery(dateFrom, dateTo);
 
             Dictionary<string, string> OrderDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(Order);
             if (OrderDictionary.Count.Equals(0))
@@ -102,9 +123,9 @@ namespace com.ambassador.support.lib.Services
             return Tuple.Create(Data, TotalData);
         }
 
-        public MemoryStream GenerateExcel(DateTime? dateFrom, DateTime? dateTo)
+        public async Task<MemoryStream> GenerateExcel(DateTime? dateFrom, DateTime? dateTo)
         {
-            var Query = getQuery(dateFrom, dateTo);
+            var Query = await getQuery(dateFrom, dateTo);
             Query = Query.OrderBy(b => b.BeacukaiDate);
             DataTable result = new DataTable();
             result.Columns.Add(new DataColumn() { ColumnName = "No", DataType = typeof(String) });
@@ -150,6 +171,37 @@ namespace com.ambassador.support.lib.Services
             
 
             return datee;
+        }
+
+        private async  Task<List<GarmentProductViewModel>> GetProductCode(string codes)
+        {
+            IHttpClientService httpClient = (IHttpClientService)this.serviceProvider.GetService(typeof(IHttpClientService));
+
+            var garmentProductionUri = APIEndpoint.Core + $"master/garmentProducts/byCode?code=" + codes;
+
+            var httpResponse = httpClient.GetAsync(garmentProductionUri).Result;
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                var content = httpResponse.Content.ReadAsStringAsync().Result;
+                Dictionary<string, object> result = JsonConvert.DeserializeObject<Dictionary<string, object>>(content);
+
+                List<GarmentProductViewModel> viewModel;
+                if (result.GetValueOrDefault("data") == null)
+                {
+                    viewModel = new List<GarmentProductViewModel>();
+                }
+                else
+                {
+                    viewModel = JsonConvert.DeserializeObject<List<GarmentProductViewModel>>(result.GetValueOrDefault("data").ToString());
+
+                }
+                return viewModel;
+            }
+            else
+            {
+                List<GarmentProductViewModel> viewModel = new List<GarmentProductViewModel>();
+                return viewModel;
+            }
         }
     }
 }
