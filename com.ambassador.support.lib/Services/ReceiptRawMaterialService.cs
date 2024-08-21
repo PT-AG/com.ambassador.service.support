@@ -45,7 +45,7 @@ namespace com.ambassador.support.lib.Services
                         "g.SmallQuantity,g.SmallUomUnit,a.DOCurrencyCode,cast((g.PricePerDealUnit * g.SmallQuantity) as decimal(18,2)) as Amount,a.SupplierName,a.Country, c.ProductSeries " +
                         "from GarmentDeliveryOrders a join GarmentDeliveryOrderItems b on a.id=b.GarmentDOId join GarmentDeliveryOrderDetails c on b.id=c.GarmentDOItemId " +
                         "join GarmentBeacukaiItems d on d.GarmentDOId=a.id join GarmentBeacukais e on e.id=d.BeacukaiId " +
-                        "join GarmentUnitReceiptNotes f on a.id=f.DOId join GarmentUnitReceiptNoteItems g on f.id=g.URNId " +
+                        "join GarmentUnitReceiptNoteItems g on c.id=g.DODetailId join GarmentUnitReceiptNotes f on g.URNId=f.Id " +
                         "where e.BeacukaiDate between @StartDate and @EndDate and a.CustomsCategory = '"+ customCategory + "'" +
                         "and a.IsDeleted=0 and b.IsDeleted=0 and c.IsDeleted=0 and d.IsDeleted=0 and e.IsDeleted=0 and f.IsDeleted=0 and g.IsDeleted=0", conn))
 
