@@ -47,7 +47,7 @@ namespace com.ambassador.support.lib.Services
                         "join GarmentBeacukaiItems d on d.GarmentDOId=a.id join GarmentBeacukais e on e.id=d.BeacukaiId " +
                         "join GarmentUnitReceiptNoteItems g on c.id=g.DODetailId join GarmentUnitReceiptNotes f on g.URNId=f.Id " +
                         "where e.BeacukaiDate between @StartDate and @EndDate and a.CustomsCategory = '"+ customCategory + "'" +
-                        "and a.IsDeleted=0 and b.IsDeleted=0 and c.IsDeleted=0 and d.IsDeleted=0 and e.IsDeleted=0 and f.IsDeleted=0 and g.IsDeleted=0", conn))
+                        "and a.IsDeleted=0 and b.IsDeleted=0 and c.IsDeleted=0 and d.IsDeleted=0 and e.IsDeleted=0 and f.IsDeleted=0 and g.IsDeleted=0 order by BCDate asc", conn))
 
                     {
                         SqlDataAdapter dataAdapter = new SqlDataAdapter(cmd);
@@ -108,7 +108,7 @@ namespace com.ambassador.support.lib.Services
             Dictionary<string, string> OrderDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(Order);
             if (OrderDictionary.Count.Equals(0))
             {
-                Query = Query.OrderBy(b => b.BeacukaiDate);
+                //Query = Query.OrderBy(b => b.BeacukaiDate);
             }
             else
             {
@@ -129,7 +129,7 @@ namespace com.ambassador.support.lib.Services
         public async Task<MemoryStream> GenerateExcel(DateTime? dateFrom, DateTime? dateTo)
         {
             var Query = await getQuery(dateFrom, dateTo);
-            Query = Query.OrderBy(b => b.BeacukaiDate);
+            //Query = Query.OrderBy(b => b.BeacukaiDate);
             DataTable result = new DataTable();
             result.Columns.Add(new DataColumn() { ColumnName = "No", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Jenis Dokumen", DataType = typeof(String) });
