@@ -10,17 +10,20 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace com.ambassador.support.lib.Services
 {
     public class ExpenditureRawMaterialService : IExpenditureRawMaterialService
     {
         IPurchasingDBContext context;
-        public ExpenditureRawMaterialService(IPurchasingDBContext _context)
+        public readonly IServiceProvider serviceProvider;
+        public ExpenditureRawMaterialService(IPurchasingDBContext _context, IServiceProvider serviceProvider)
         {
             this.context = _context;
+            this.serviceProvider = serviceProvider;
         }
-        public IQueryable<ExpenditureRawMaterialViewModel> getQuery(DateTimeOffset? dateFrom, DateTimeOffset? dateTo, int offset)
+        public async Task<IQueryable<ExpenditureRawMaterialViewModel>> getQuery(DateTimeOffset? dateFrom, DateTimeOffset? dateTo, int offset)
         {
             DateTimeOffset d1 = dateFrom.Value.AddHours(offset);
             DateTimeOffset d2 = dateTo.Value.AddHours(offset);
@@ -82,6 +85,9 @@ namespace com.ambassador.support.lib.Services
                             };
                             reportData.Add(view);
                         }
+
+                       
+
                     }
                     conn.Close();
                 }
@@ -90,11 +96,27 @@ namespace com.ambassador.support.lib.Services
             {
                 throw new Exception(ex.Message);
             }
+
+            var Codes = await GetProductCode(string.Join(",", reportData.Select(x => x.ProductCode).Distinct().ToList()));
+
+            foreach (var a in reportData)
+            {
+                var remark = Codes.FirstOrDefault(x => x.Code == a.ProductCode);
+
+                var Composition = remark == null ? "-" : remark.Composition;
+                var Width = remark == null ? "-" : remark.Width;
+                var Const = remark == null ? "-" : remark.Const;
+                var Yarn = remark == null ? "-" : remark.Yarn;
+                var Name = remark == null ? "-" : remark.Name;
+
+                a.ProductName = remark != null ? string.Concat(a.ProductName, " - ", Composition, "", Width, "", Const, "", Yarn) : a.ProductName;
+
+            }
             return reportData.AsQueryable();
         }
-        public Tuple<List<ExpenditureRawMaterialViewModel>, int> GetReport(DateTimeOffset? dateFrom, DateTimeOffset? dateTo, int page, int size, string Order, int offset)
+        public async Task<Tuple<List<ExpenditureRawMaterialViewModel>, int>> GetReport(DateTimeOffset? dateFrom, DateTimeOffset? dateTo, int page, int size, string Order, int offset)
         {
-            var Query = getQuery(dateFrom, dateTo, offset);
+            var Query = await getQuery(dateFrom, dateTo, offset);
 
             Dictionary<string, string> OrderDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(Order);
             if (OrderDictionary.Count.Equals(0))
@@ -118,9 +140,9 @@ namespace com.ambassador.support.lib.Services
             return Tuple.Create(Data, TotalData);
         }
 
-        public MemoryStream GenerateExcel(DateTimeOffset? dateFrom, DateTimeOffset? dateTo, int offset)
+        public async Task<MemoryStream> GenerateExcel(DateTimeOffset? dateFrom, DateTimeOffset? dateTo, int offset)
         {
-            var Query = getQuery(dateFrom, dateTo, offset);
+            var Query = await getQuery(dateFrom, dateTo, offset);
             Query = Query.OrderBy(b => b.ExpenditureDate);
             DataTable result = new DataTable();
             result.Columns.Add(new DataColumn() { ColumnName = "No", DataType = typeof(String) });
@@ -158,6 +180,38 @@ namespace com.ambassador.support.lib.Services
             
 
             return datee;
+        }
+
+
+        private async Task<List<GarmentProductViewModel>> GetProductCode(string codes)
+        {
+            IHttpClientService httpClient = (IHttpClientService)this.serviceProvider.GetService(typeof(IHttpClientService));
+
+            var garmentProductionUri = APIEndpoint.Core + $"master/garmentProducts/byCode?code=" + codes;
+
+            var httpResponse = httpClient.GetAsync(garmentProductionUri).Result;
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                var content = httpResponse.Content.ReadAsStringAsync().Result;
+                Dictionary<string, object> result = JsonConvert.DeserializeObject<Dictionary<string, object>>(content);
+
+                List<GarmentProductViewModel> viewModel;
+                if (result.GetValueOrDefault("data") == null)
+                {
+                    viewModel = new List<GarmentProductViewModel>();
+                }
+                else
+                {
+                    viewModel = JsonConvert.DeserializeObject<List<GarmentProductViewModel>>(result.GetValueOrDefault("data").ToString());
+
+                }
+                return viewModel;
+            }
+            else
+            {
+                List<GarmentProductViewModel> viewModel = new List<GarmentProductViewModel>();
+                return viewModel;
+            }
         }
     }
 }

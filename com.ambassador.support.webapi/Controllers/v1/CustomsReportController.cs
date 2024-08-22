@@ -58,15 +58,15 @@ namespace com.ambassador.support.webapi.Controllers.v1
         }
 
         [HttpGet("expenditure-raw-material")]
-        public IActionResult GetExpenditureRawMaterial(DateTimeOffset? dateFrom, DateTimeOffset? dateTo, int page, int size, string Order = "{}")
+        public async Task<IActionResult> GetExpenditureRawMaterial(DateTimeOffset? dateFrom, DateTimeOffset? dateTo, int page, int size, string Order = "{}")
         {
             int offset = Convert.ToInt32(Request.Headers["x-timezone-offset"]);
             string accept = Request.Headers["Accept"];
-
+            IdentityService.Token = Request.Headers["Authorization"].FirstOrDefault().Replace("Bearer ", "");
             try
             {
 
-                var data = expenditureRawMaterialService.GetReport(dateFrom, dateTo, page, size, Order, offset);
+                var data =await expenditureRawMaterialService.GetReport(dateFrom, dateTo, page, size, Order, offset);
 
                 return Ok(new
                 {
@@ -85,17 +85,18 @@ namespace com.ambassador.support.webapi.Controllers.v1
         }
 
         [HttpGet("expenditure-raw-material/download")]
-        public IActionResult GetXlsIN( DateTimeOffset? dateFrom, DateTimeOffset? dateTo)
+        public async Task<IActionResult> GetXlsIN( DateTimeOffset? dateFrom, DateTimeOffset? dateTo)
         {
             int offset = Convert.ToInt32(Request.Headers["x-timezone-offset"]);
             string accept = Request.Headers["Accept"];
+            IdentityService.Token = Request.Headers["Authorization"].FirstOrDefault().Replace("Bearer ", "");
             try
             {
                 byte[] xlsInBytes;
                 //DateTime DateFrom = dateFrom == null ? new DateTime(1970, 1, 1) : Convert.ToDateTime(dateFrom);
                 //DateTime DateTo = dateTo == null ? DateTime.Now : Convert.ToDateTime(dateTo);
 
-                var xls = expenditureRawMaterialService.GenerateExcel(dateFrom, dateTo, offset);
+                var xls = await expenditureRawMaterialService.GenerateExcel(dateFrom, dateTo, offset);
 
                 string filename = String.Format("Laporan Pemakaian Bahan Baku - {0}.xlsx", DateTime.UtcNow.ToString("ddMMyyyy"));
 
