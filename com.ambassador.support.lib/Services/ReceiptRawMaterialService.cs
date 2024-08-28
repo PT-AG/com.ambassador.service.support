@@ -42,7 +42,7 @@ namespace com.ambassador.support.lib.Services
                     using (SqlCommand cmd = new SqlCommand(
                         "declare @StartDate datetime = '" + d1 + "' declare @EndDate datetime = '" + d2 + "' " +
                         "select distinct e.CustomsType,e.BeacukaiNo,convert(date,dateadd(hour,7,e.BeacukaiDate)) as BCDate,f.URNNo,convert(date,dateadd(hour,7,f.ReceiptDate)) as URNDate,g.ProductCode,g.ProductName," +
-                        "g.SmallQuantity,g.SmallUomUnit,a.DOCurrencyCode,cast((g.PricePerDealUnit * g.SmallQuantity) as decimal(18,2)) as Amount,a.SupplierName,a.Country, c.ProductSeries " +
+                        "g.SmallQuantity,g.SmallUomUnit,a.DOCurrencyCode,cast((g.PricePerDealUnit * g.SmallQuantity) as decimal(18,2)) as Amount,a.SupplierName,a.Country, c.ProductSeries, g.DeletedAgent " +
                         "from GarmentDeliveryOrders a join GarmentDeliveryOrderItems b on a.id=b.GarmentDOId join GarmentDeliveryOrderDetails c on b.id=c.GarmentDOItemId " +
                         "join GarmentBeacukaiItems d on d.GarmentDOId=a.id join GarmentBeacukais e on e.id=d.BeacukaiId " +
                         "join GarmentUnitReceiptNoteItems g on c.id=g.DODetailId join GarmentUnitReceiptNotes f on g.URNId=f.Id " +
@@ -71,7 +71,8 @@ namespace com.ambassador.support.lib.Services
                                 Amount = (decimal)data["Amount"],
                                 StorageName = "GUDANG AG2",
                                 SupplierName = "-",
-                                Country = data["Country"].ToString()
+                                Country = data["Country"].ToString(),
+                                DeletedAgent = data["DeletedAgent"].ToString()
                             };
                             reportData.Add(view);
                         }
@@ -85,6 +86,7 @@ namespace com.ambassador.support.lib.Services
 
             var Codes = await GetProductCode(string.Join(",", reportData.Select(x => x.ProductCode).Distinct().ToList()));
 
+            string[] exceptionBCNo = { "629905", "627663" };
             foreach(var a in reportData)
             {
                 var remark = Codes.FirstOrDefault(x => x.Code == a.ProductCode);
@@ -95,8 +97,14 @@ namespace com.ambassador.support.lib.Services
                 var Yarn = remark == null ? "-" : remark.Yarn;
                 var Name = remark == null ? "-" : remark.Name;
 
-                a.ProductName = remark != null ? string.Concat(a.ProductName, " - ",Composition, "", Width, "", Const, "", Yarn) : a.ProductName;
-
+                if (!exceptionBCNo.Contains(a.BeacukaiNo))
+                {
+                    a.ProductName = remark != null ? string.Concat(a.ProductName, " - ", Composition, "", Width, "", Const, "", Yarn) : a.ProductName;
+                }
+                else
+                {
+                    a.ProductName = string.Concat(a.ProductName, " - ", a.DeletedAgent);
+                }
             }
 
             return reportData.AsQueryable();
