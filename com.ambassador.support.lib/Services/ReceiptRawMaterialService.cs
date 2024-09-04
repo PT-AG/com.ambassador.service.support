@@ -42,7 +42,7 @@ namespace com.ambassador.support.lib.Services
                     using (SqlCommand cmd = new SqlCommand(
                         "declare @StartDate datetime = '" + d1 + "' declare @EndDate datetime = '" + d2 + "' " +
                         "select distinct e.CustomsType,e.BeacukaiNo,convert(date,dateadd(hour,7,e.BeacukaiDate)) as BCDate,f.URNNo,convert(date,dateadd(hour,7,f.ReceiptDate)) as URNDate,g.ProductCode,g.ProductName," +
-                        "g.SmallQuantity,g.SmallUomUnit,a.DOCurrencyCode,cast((g.PricePerDealUnit * g.SmallQuantity) as decimal(18,2)) as Amount,a.SupplierName,a.Country, c.ProductSeries, g.DeletedAgent " +
+                        "g.SmallQuantity,g.SmallUomUnit,a.DOCurrencyCode,cast((g.PricePerDealUnit * g.SmallQuantity) as decimal(18,2)) as Amount,a.SupplierName,a.Country, c.ProductSeries, c.DeletedAgent " +
                         "from GarmentDeliveryOrders a join GarmentDeliveryOrderItems b on a.id=b.GarmentDOId join GarmentDeliveryOrderDetails c on b.id=c.GarmentDOItemId " +
                         "join GarmentBeacukaiItems d on d.GarmentDOId=a.id join GarmentBeacukais e on e.id=d.BeacukaiId " +
                         "join GarmentUnitReceiptNoteItems g on c.id=g.DODetailId join GarmentUnitReceiptNotes f on g.URNId=f.Id " +
@@ -92,14 +92,14 @@ namespace com.ambassador.support.lib.Services
                 var remark = Codes.FirstOrDefault(x => x.Code == a.ProductCode);
 
                 var Composition = remark == null ? "-" : remark.Composition;
-                var Width = remark == null ? "-" : remark.Width;
-                var Const = remark == null ? "-" : remark.Const;
-                var Yarn = remark == null ? "-" : remark.Yarn;
-                var Name = remark == null ? "-" : remark.Name;
+                //var Width = remark == null ? "-" : remark.Width;
+                //var Const = remark == null ? "-" : remark.Const;
+                //var Yarn = remark == null ? "-" : remark.Yarn;
+                //var Name = remark == null ? "-" : remark.Name;
 
                 if (!exceptionBCNo.Contains(a.BeacukaiNo))
                 {
-                    a.ProductName = remark != null ? string.Concat(a.ProductName, " - ", Composition, "", Width, "", Const, "", Yarn) : a.ProductName;
+                    a.ProductName = remark != null ? string.Concat(a.ProductName, " - ", Composition, " - ", a.DeletedAgent) : a.ProductName;
                 }
                 else
                 {
