@@ -104,12 +104,12 @@ namespace com.ambassador.support.lib.Services
                 var remark = Codes.FirstOrDefault(x => x.Code == a.ProductCode);
 
                 var Composition = remark == null ? "-" : remark.Composition;
-                var Width = remark == null ? "-" : remark.Width;
-                var Const = remark == null ? "-" : remark.Const;
-                var Yarn = remark == null ? "-" : remark.Yarn;
-                var Name = remark == null ? "-" : remark.Name;
+                //var Width = remark == null ? "-" : remark.Width;
+                //var Const = remark == null ? "-" : remark.Const;
+                //var Yarn = remark == null ? "-" : remark.Yarn;
+                //var Name = remark == null ? "-" : remark.Name;
 
-                a.ProductName = remark != null ? string.Concat(a.ProductName, " - ", Composition, "", Width, "", Const, "", Yarn) : a.ProductName;
+                a.ProductName = remark != null ? string.Concat(a.ProductName, " - ", Composition/*, "", Width, "", Const, "", Yarn*/) : a.ProductName;
 
             }
             return reportData.AsQueryable();
