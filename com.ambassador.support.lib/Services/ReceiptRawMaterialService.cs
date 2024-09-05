@@ -86,7 +86,7 @@ namespace com.ambassador.support.lib.Services
 
             var Codes = await GetProductCode(string.Join(",", reportData.Select(x => x.ProductCode).Distinct().ToList()));
 
-            string[] exceptionBCNo = { "629905", "627663" };
+            string[] exceptionBCNo = { "629905", "627663" , "038117", "046380", "621904", "758615", "643895" };
             foreach(var a in reportData)
             {
                 var remark = Codes.FirstOrDefault(x => x.Code == a.ProductCode);
@@ -99,11 +99,11 @@ namespace com.ambassador.support.lib.Services
 
                 if (!exceptionBCNo.Contains(a.BeacukaiNo))
                 {
-                    a.ProductName = remark != null ? string.Concat(a.ProductName, " - ", Composition, " - ", a.DeletedAgent) : a.ProductName;
+                    a.ProductName = remark != null ? string.Concat(a.ProductName, " - ", Composition) : a.ProductName;
                 }
                 else
                 {
-                    a.ProductName = string.Concat(a.ProductName, " - ", a.DeletedAgent);
+                    a.ProductName = string.Concat(a.ProductName, " - ", Composition + " - "+ a.DeletedAgent);
                 }
             }
 
