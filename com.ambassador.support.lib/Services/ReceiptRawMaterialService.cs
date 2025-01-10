@@ -99,11 +99,11 @@ namespace com.ambassador.support.lib.Services
 
                 if (!exceptionBCNo.Contains(a.BeacukaiNo))
                 {
-                    a.ProductName = remark != null ? string.Concat(a.ProductName, " - ", Composition) : a.ProductName;
+                    a.ProductName = remark != null ? string.Concat(/*a.ProductName, " - ",*/ Composition) : a.ProductName;
                 }
                 else
                 {
-                    a.ProductName = string.Concat(a.ProductName, " - ", Composition + " - "+ a.DeletedAgent);
+                    a.ProductName = string.Concat(/*a.ProductName, " - ",*/ Composition + " - "+ a.DeletedAgent);
                 }
             }
 
