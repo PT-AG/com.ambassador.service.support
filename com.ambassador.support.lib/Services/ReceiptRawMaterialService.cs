@@ -42,12 +42,14 @@ namespace com.ambassador.support.lib.Services
                     using (SqlCommand cmd = new SqlCommand(
                         "declare @StartDate datetime = '" + d1 + "' declare @EndDate datetime = '" + d2 + "' " +
                         "select distinct e.CustomsType,e.BeacukaiNo,convert(date,dateadd(hour,7,e.BeacukaiDate)) as BCDate,f.URNNo,convert(date,dateadd(hour,7,f.ReceiptDate)) as URNDate,g.ProductCode,g.ProductName," +
-                        "g.SmallQuantity,g.SmallUomUnit,a.DOCurrencyCode,cast((g.PricePerDealUnit * g.SmallQuantity) as decimal(18,2)) as Amount,a.SupplierName,a.Country, c.ProductSeries, c.DeletedAgent " +
+                        "sum(g.SmallQuantity) as SmallQuantity,g.SmallUomUnit,a.DOCurrencyCode,sum(cast((g.PricePerDealUnit * g.SmallQuantity) as decimal(18,2))) as Amount,a.SupplierName,a.Country, c.ProductSeries, c.DeletedAgent " +
                         "from GarmentDeliveryOrders a join GarmentDeliveryOrderItems b on a.id=b.GarmentDOId join GarmentDeliveryOrderDetails c on b.id=c.GarmentDOItemId " +
                         "join GarmentBeacukaiItems d on d.GarmentDOId=a.id join GarmentBeacukais e on e.id=d.BeacukaiId " +
                         "join GarmentUnitReceiptNoteItems g on c.id=g.DODetailId join GarmentUnitReceiptNotes f on g.URNId=f.Id " +
                         "where e.BeacukaiDate between @StartDate and @EndDate and a.CustomsCategory = '"+ customCategory + "' and f.URNType='PEMBELIAN' " +
-                        "and a.IsDeleted=0 and b.IsDeleted=0 and c.IsDeleted=0 and d.IsDeleted=0 and e.IsDeleted=0 and f.IsDeleted=0 and g.IsDeleted=0 order by BCDate asc", conn))
+                        "and a.IsDeleted=0 and b.IsDeleted=0 and c.IsDeleted=0 and d.IsDeleted=0 and e.IsDeleted=0 and f.IsDeleted=0 and g.IsDeleted=0 " +
+                        "group by e.CustomsType,e.BeacukaiNo,e.BeacukaiDate,f.URNNo,f.ReceiptDate,g.ProductCode,g.ProductName,g.SmallUomUnit,a.DOCurrencyCode,a.SupplierName,a.Country,c.ProductSeries,c.DeletedAgent " +
+                        "order by BCDate asc", conn))
 
                     {
                         SqlDataAdapter dataAdapter = new SqlDataAdapter(cmd);
