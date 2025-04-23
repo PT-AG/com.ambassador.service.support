@@ -614,7 +614,7 @@ namespace com.ambassador.support.lib.Services
                                 ItemCode = dataRow["ItemCode"].ToString(),
                                 CurrencyCode = dataRow["CurrencyCode"].ToString(),
                                 Country = dataRow["Country"].ToString(),
-                                Nominal = ((decimal)dataRow["Price"] * Convert.ToDecimal((double)dataRow["Quantity"])),
+                                Nominal = ((decimal)dataRow["Price"]/* * Convert.ToDecimal((double)dataRow["Quantity"])*/),
                                 BuyerName = dataRow["BuyerName"].ToString(),
                             };
 
