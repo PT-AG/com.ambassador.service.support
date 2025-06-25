@@ -14,5 +14,6 @@ namespace com.ambassador.support.lib.ViewModel
         public double QuantitySC { get; set; }
         public string UomUnit { get; set; }
         public string StorageName { get; set; }                
+        public string RONo { get; set; }                
     }
 }
