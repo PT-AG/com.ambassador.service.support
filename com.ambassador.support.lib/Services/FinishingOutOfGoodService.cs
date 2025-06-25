@@ -44,13 +44,13 @@ namespace com.ambassador.support.lib.Services
                         //") as data group by FinishingOutNo, FODate, ComodityCode,ComodityName,UomUnit,FinishingInType ", conn))
 
                         "declare @StartDate datetime = '" + d1 + "' declare @EndDate datetime = '" + d2 + "' " +
-                        "select FinishingOutNo, FODate,ComodityCode,ComodityName,sum(Quantity) as Quantity ,UomUnit from ( " +
-                        "select distinct a.FinishingOutNo, convert(date, dateadd(hour, 7, a.FinishingOutDate)) as FODate, a.ComodityCode, a.ComodityName, b.Quantity, b.UomUnit, b.[Identity] from GarmentFinishingOuts a " +
+                        "select FinishingOutNo, FODate,ComodityCode,ComodityName,sum(Quantity) as Quantity ,UomUnit,RONo from ( " +
+                        "select distinct a.FinishingOutNo,a.RONo, convert(date, dateadd(hour, 7, a.FinishingOutDate)) as FODate, a.ComodityCode, a.ComodityName, b.Quantity, b.UomUnit, b.[Identity] from GarmentFinishingOuts a " +
                         "join GarmentFinishingOutItems b on a.[Identity] = b.FinishingOutId " +
                         "join GarmentPreparings d on a.RONo = d.RONo " +
                         "join GarmentPreparingItems e on d.[Identity] = e.GarmentPreparingId " +
                         "where a.Deleted = 0 and a.FinishingTo = 'GUDANG JADI' and e.CustomsCategory = 'FASILITAS' and  DATEADD(HOUR, 7, a.FinishingOutDate) between  @StartDate and @EndDate " +
-                        ") as data group by FinishingOutNo, FODate, ComodityCode,ComodityName,UomUnit ", conn))
+                        ") as data group by FinishingOutNo, FODate, ComodityCode,ComodityName,UomUnit,RONo ", conn))
                     {
                         SqlDataAdapter dataAdapter = new SqlDataAdapter(cmd);
                         DataSet dSet = new DataSet();
@@ -69,6 +69,7 @@ namespace com.ambassador.support.lib.Services
                                 //Quantity = data["FinishingInType"].ToString() == "SEWING" ? (double)data["Quantity"] : 0,
                                 //QuantitySC = data["FinishingInType"].ToString() != "SEWING" ? (double)data["Quantity"] : 0,
                                 StorageName = "GUDANG JADI",                                
+                                RONo = data["RONo"].ToString(),                                
                             };
                             reportData.Add(view);
                         }
@@ -113,6 +114,7 @@ namespace com.ambassador.support.lib.Services
             DataTable result = new DataTable();
             result.Columns.Add(new DataColumn() { ColumnName = "No", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "No Bukti Penerimaan", DataType = typeof(String) });
+            result.Columns.Add(new DataColumn() { ColumnName = "RONo", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Tgl Bukti Penerimaan", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Kode Barang", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Nama Barang", DataType = typeof(String) });
@@ -123,7 +125,7 @@ namespace com.ambassador.support.lib.Services
            
             if (Query.ToArray().Count() == 0)
             {
-                result.Rows.Add("", "", "", "", "", "", 0, 0, ""); // to allow column name to be generated properly for empty data as template
+                result.Rows.Add("", "", "", "","", "", "", 0, 0, ""); // to allow column name to be generated properly for empty data as template
             }
             else
             {
@@ -131,7 +133,7 @@ namespace com.ambassador.support.lib.Services
                 foreach (var item in Query)
                 {
                     i++;
-                    result.Rows.Add(i.ToString(),item.FinishingOutNo,formattedDate(item.FinishingOutDate),item.ProductCode,
+                    result.Rows.Add(i.ToString(),item.FinishingOutNo,item.RONo,formattedDate(item.FinishingOutDate),item.ProductCode,
                                     item.ProductName,item.UomUnit,item.Quantity,item.QuantitySC,item.StorageName);
                 }
             }
