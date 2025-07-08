@@ -41,7 +41,7 @@ namespace com.ambassador.support.lib.Services
                     conn.Open();
                     using (SqlCommand cmd = new SqlCommand(
                         "declare @StartDate datetimeoffset = '" + d1 + "' declare @EndDate datetimeoffset = '" + d2 + "' " +
-                        "select distinct l.UENNo,convert(date,dateadd(hour,7,l.ExpenditureDate)) as 'Tanggal Keluar',k.ProductCode,k.ProductName,k.UomUnit,k.Quantity,l.ExpenditureType from GarmentDeliveryOrders a  " +
+                        "select distinct l.UENNo,convert(date,dateadd(hour,7,l.ExpenditureDate)) as 'Tanggal Keluar',k.ProductCode,k.ProductName,k.UomUnit,k.Quantity,l.ExpenditureType,k.Colour from GarmentDeliveryOrders a  " +
                         "join GarmentDeliveryOrderItems b on a.id=b.GarmentDOId join GarmentDeliveryOrderDetails c on b.id=c.GarmentDOItemId " +
                         "join GarmentBeacukaiItems d on d.GarmentDOId=a.id join GarmentBeacukais e on e.id=d.BeacukaiId " +
                         "join GarmentUnitReceiptNotes f on a.id=f.DOId join GarmentUnitReceiptNoteItems g on f.id=g.URNId " +
