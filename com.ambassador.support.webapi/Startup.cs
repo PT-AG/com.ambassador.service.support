@@ -117,27 +117,27 @@ namespace com.ambassador.support.webapi
                        .WithExposedHeaders("Content-Disposition", "api-version", "content-length", "content-md5", "content-type", "date", "request-id", "response-time");
             }));
 
-            #region Swagger
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new Info() { Title = "My API", Version = "v1" });
-                c.AddSecurityDefinition("Bearer", new ApiKeyScheme()
-                {
-                    In = "header",
-                    Description = "Please enter into field the word 'Bearer' following by space and JWT",
-                    Name = "Authorization",
-                    Type = "apiKey",
-                });
-                c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>()
-                {
-                    {
-                        "Bearer",
-                        Enumerable.Empty<string>()
-                    }
-                });
-                c.CustomSchemaIds(i => i.FullName);
-            });
-            #endregion
+            //#region Swagger
+            //services.AddSwaggerGen(c =>
+            //{
+            //    c.SwaggerDoc("v1", new Info() { Title = "My API", Version = "v1" });
+            //    c.AddSecurityDefinition("Bearer", new ApiKeyScheme()
+            //    {
+            //        In = "header",
+            //        Description = "Please enter into field the word 'Bearer' following by space and JWT",
+            //        Name = "Authorization",
+            //        Type = "apiKey",
+            //    });
+            //    c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>()
+            //    {
+            //        {
+            //            "Bearer",
+            //            Enumerable.Empty<string>()
+            //        }
+            //    });
+            //    c.CustomSchemaIds(i => i.FullName);
+            //});
+            //#endregion
 
             RegisterEndpoint();
         }
@@ -153,11 +153,11 @@ namespace com.ambassador.support.webapi
             app.UseAuthentication();
             app.UseCors("SupportPolicy");
             app.UseMvc();
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
-            });
+            //app.UseSwagger();
+            //app.UseSwaggerUI(c =>
+            //{
+            //    c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
+            //});
         }
     }
 }
