@@ -42,7 +42,7 @@ namespace com.ambassador.support.lib.Services
                     using (SqlCommand cmd = new SqlCommand(
                         "declare @StartDate datetime = '" + d1 + "' declare @EndDate datetime = '" + d2 + "' " +
                         "select distinct e.CustomsType,e.BeacukaiNo,convert(date,dateadd(hour,7,e.BeacukaiDate)) as BCDate,f.URNNo,convert(date,dateadd(hour,7,f.ReceiptDate)) as URNDate,g.ProductCode,g.ProductName," +
-                        "sum(g.SmallQuantity) as SmallQuantity,g.SmallUomUnit,a.DOCurrencyCode,sum(cast((g.PricePerDealUnit * g.SmallQuantity) as decimal(18,2))) as Amount,a.SupplierName,a.Country, c.ProductSeries, c.DeletedAgent " +
+                        "sum(g.SmallQuantity) as SmallQuantity,g.SmallUomUnit,a.DOCurrencyCode,sum(cast((g.PricePerDealUnit * g.ReceiptQuantity) as decimal(18,2))) as Amount,a.SupplierName,a.Country, c.ProductSeries, c.DeletedAgent " +
                         "from GarmentDeliveryOrders a join GarmentDeliveryOrderItems b on a.id=b.GarmentDOId join GarmentDeliveryOrderDetails c on b.id=c.GarmentDOItemId " +
                         "join GarmentBeacukaiItems d on d.GarmentDOId=a.id join GarmentBeacukais e on e.id=d.BeacukaiId " +
                         "join GarmentUnitReceiptNoteItems g on c.id=g.DODetailId join GarmentUnitReceiptNotes f on g.URNId=f.Id " +
