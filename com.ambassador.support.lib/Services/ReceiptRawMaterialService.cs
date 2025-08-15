@@ -91,8 +91,8 @@ namespace com.ambassador.support.lib.Services
             string[] exceptionBCNo = { "629905", "627663" , "038117", "046380", "621904", "758615", "643895" };
             foreach(var a in reportData)
             {
-                var remark = Codes.FirstOrDefault(x => x.Code == a.ProductCode);
-
+                var trimProduct = a.ProductCode.Trim();
+                var remark = Codes.FirstOrDefault(x => x.Code.Trim() == trimProduct);
                 var Composition = remark == null ? "-" : remark.Composition;
                 //var Width = remark == null ? "-" : remark.Width;
                 //var Const = remark == null ? "-" : remark.Const;
