@@ -159,6 +159,37 @@ namespace com.ambassador.support.lib.Services
 
         //    return flattenedData.AsQueryable();
         //}
+
+        //private async Task<List<GarmentProductViewModel>> GetProductCode(string codes)
+        //{
+        //    IHttpClientService httpClient = (IHttpClientService)this.serviceProvider.GetService(typeof(IHttpClientService));
+
+        //    var garmentProductionUri = APIEndpoint.Core + $"master/garmentProducts/byCode?code=" + codes;
+
+        //    var httpResponse = httpClient.GetAsync(garmentProductionUri).Result;
+        //    if (httpResponse.IsSuccessStatusCode)
+        //    {
+        //        var content = httpResponse.Content.ReadAsStringAsync().Result;
+        //        Dictionary<string, object> result = JsonConvert.DeserializeObject<Dictionary<string, object>>(content);
+
+        //        List<GarmentProductViewModel> viewModel;
+        //        if (result.GetValueOrDefault("data") == null)
+        //        {
+        //            viewModel = new List<GarmentProductViewModel>();
+        //        }
+        //        else
+        //        {
+        //            viewModel = JsonConvert.DeserializeObject<List<GarmentProductViewModel>>(result.GetValueOrDefault("data").ToString());
+
+        //        }
+        //        return viewModel;
+        //    }
+        //    else
+        //    {
+        //        List<GarmentProductViewModel> viewModel = new List<GarmentProductViewModel>();
+        //        return viewModel;
+        //    }
+        //}
         #endregion
         public async Task<IQueryable<ReceiptRawMaterialViewModel>> getQuery(DateTime? dateFrom, DateTime? dateTo)
         {
@@ -185,6 +216,7 @@ namespace com.ambassador.support.lib.Services
                             SerialNo = a.SeriBarang.ToString(),
                             URNDate = a.URNDate.Value.ToString("dd-MM-yyyy"),
                             StorageName = a.StorageName,
+                            SupplierName=a.SupplierName
                         };
 
             return query.AsQueryable();
@@ -249,7 +281,7 @@ namespace com.ambassador.support.lib.Services
                 foreach (var item in Query)
                 {
                     i++;
-                    result.Rows.Add(i.ToString(), item.RecordDate,item.CustomsType,item.BeacukaiNo,formattedDate(item.BeacukaiDate), item.HsCode,item.SerialNo,item.URNNo,formattedDate(item.URNDate),item.ProductCode,
+                    result.Rows.Add(i.ToString(), item.RecordDate,item.CustomsType,item.BeacukaiNo,item.BeacukaiDate, item.HsCode,item.SerialNo,item.URNNo,item.URNDate,item.ProductCode,
                                     item.ProductName,item.SmallUomUnit,item.SmallQuantity,item.DOCurrencyCode,item.Amount,item.StorageName,item.SupplierName,item.Country);
                 }
             }
@@ -265,37 +297,6 @@ namespace com.ambassador.support.lib.Services
             
 
             return datee;
-        }
-
-        private async  Task<List<GarmentProductViewModel>> GetProductCode(string codes)
-        {
-            IHttpClientService httpClient = (IHttpClientService)this.serviceProvider.GetService(typeof(IHttpClientService));
-
-            var garmentProductionUri = APIEndpoint.Core + $"master/garmentProducts/byCode?code=" + codes;
-
-            var httpResponse = httpClient.GetAsync(garmentProductionUri).Result;
-            if (httpResponse.IsSuccessStatusCode)
-            {
-                var content = httpResponse.Content.ReadAsStringAsync().Result;
-                Dictionary<string, object> result = JsonConvert.DeserializeObject<Dictionary<string, object>>(content);
-
-                List<GarmentProductViewModel> viewModel;
-                if (result.GetValueOrDefault("data") == null)
-                {
-                    viewModel = new List<GarmentProductViewModel>();
-                }
-                else
-                {
-                    viewModel = JsonConvert.DeserializeObject<List<GarmentProductViewModel>>(result.GetValueOrDefault("data").ToString());
-
-                }
-                return viewModel;
-            }
-            else
-            {
-                List<GarmentProductViewModel> viewModel = new List<GarmentProductViewModel>();
-                return viewModel;
-            }
         }
     }
 }
