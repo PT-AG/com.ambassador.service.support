@@ -14,6 +14,8 @@ namespace com.ambassador.support.lib
         public virtual DbSet<ViewFactBeacukai> ViewFactBeacukai { get; set; }
 		public virtual DbSet<WIPViewModel> ViewWIP { get; set; }
         public virtual DbSet<HOrder> HOrder { get; set; }
+        public virtual DbSet<Raw_Material_Income_Report> Raw_Material_Income_Report { get; set; }
+
 
         public SupportDbContext(DbContextOptions<SupportDbContext> options) : base(options)
         {

@@ -17,146 +17,178 @@ namespace com.ambassador.support.lib.Services
 {
     public class ReceiptRawMaterialService : IReceiptRawMaterialService
     {
-        IPurchasingDBContext context;
+        SupportDbContext context;
         public readonly IServiceProvider serviceProvider;
-        public ReceiptRawMaterialService(IPurchasingDBContext _context, IServiceProvider serviceProvider)
+        public ReceiptRawMaterialService(SupportDbContext _context, IServiceProvider serviceProvider)
         {
             this.context = _context;
             this.serviceProvider = serviceProvider;
         }
+        #region oldQuery
+        //public async Task<IQueryable<ReceiptRawMaterialViewModel>> getQuery(DateTime? dateFrom, DateTime? dateTo)
+        //{
+        //    var d1 = dateFrom.Value.ToString("yyyy-MM-dd");
+        //    var d2 = dateTo.Value.ToString("yyyy-MM-dd");
+        //    var customCategory = "Fasilitas";
+
+
+        //    List<ReceiptRawMaterialViewModel> reportData = new List<ReceiptRawMaterialViewModel>();
+
+        //    try
+        //    {
+        //        string connectionString = APIEndpoint.PurchasingConnectionString;
+        //        using (SqlConnection conn = new SqlConnection(connectionString))
+        //        {
+        //            conn.Open();
+        //            using (SqlCommand cmd = new SqlCommand(
+        //                "declare @StartDate datetime = '" + d1 + "' declare @EndDate datetime = '" + d2 + "' " +
+        //                "select distinct e.CustomsType,e.BeacukaiNo,convert(date,dateadd(hour,7,e.BeacukaiDate)) as BCDate," +
+        //                "f.URNNo,convert(date,dateadd(hour,7,f.ReceiptDate)) as URNDate, a.DOCurrencyCode," +
+        //                "a.SupplierName,a.Country, " +
+        //                "c.ProductSeries,c.HsCode,a.RecordDate, c.DeletedAgent," +
+        //                "COALESCE(NULLIF(g.PIBProductCode, ''), g.ProductCode) AS ProductCode," +
+        //                "COALESCE(NULLIF(g.PIBProductName, ''), g.ProductName) AS ProductName, " +
+        //                "COALESCE(NULLIF(g.PIBUom, ''), g.SmallUomUnit) AS SmallUomUnit," +
+        //                "SUM(CASE WHEN g.PIBQuantity IS NOT NULL AND g.PIBQuantity <> 0 THEN g.PIBQuantity" +
+        //                " ELSE g.SmallQuantity END ) AS SmallQuantity," +
+        //                "SUM(CASE WHEN g.PIBValue IS NOT NULL AND g.PIBValue <> 0 THEN g.PIBValue " +
+        //                "ELSE CAST((g.PricePerDealUnit * g.ReceiptQuantity) AS DECIMAL(18,2)) END) AS Amount " +
+        //                "from GarmentDeliveryOrders a join GarmentDeliveryOrderItems b on a.id=b.GarmentDOId " +
+        //                "join GarmentDeliveryOrderDetails c on b.id=c.GarmentDOItemId " +
+        //                "join GarmentBeacukaiItems d on d.GarmentDOId=a.id join GarmentBeacukais e on e.id=d.BeacukaiId " +
+        //                "join GarmentUnitReceiptNoteItems g on c.id=g.DODetailId join GarmentUnitReceiptNotes f on g.URNId=f.Id " +
+        //                "where e.BeacukaiDate between @StartDate and @EndDate and a.CustomsCategory = '"+ customCategory +
+        //                "' and f.URNType='PEMBELIAN' and a.IsDeleted=0 and b.IsDeleted=0 and c.IsDeleted=0 and d.IsDeleted=0 " +
+        //                "and e.IsDeleted=0 and f.IsDeleted=0 and g.IsDeleted=0 " +
+        //                "group by e.CustomsType,e.BeacukaiNo,e.BeacukaiDate,f.URNNo,f.ReceiptDate,g.ProductCode,g.ProductName,g.SmallUomUnit," +
+        //                "a.DOCurrencyCode,a.SupplierName,a.Country,c.ProductSeries,c.HsCode,a.RecordDate,c.DeletedAgent, " +
+        //                " g.PIBUom, g.PIBProductName, g.PIBProductCode  " +
+        //                "order by BCDate asc", conn))
+
+        //            {
+        //                SqlDataAdapter dataAdapter = new SqlDataAdapter(cmd);
+        //                DataSet dSet = new DataSet();
+        //                dataAdapter.Fill(dSet);
+        //                foreach (DataRow data in dSet.Tables[0].Rows)
+        //                {
+        //                    ReceiptRawMaterialViewModel view = new ReceiptRawMaterialViewModel
+        //                    {
+        //                        CustomsType = data["CustomsType"].ToString(),
+        //                        BeacukaiNo = data["BeacukaiNo"].ToString(),
+        //                        BeacukaiDate = data["BCDate"].ToString(),
+        //                        SerialNo = data["ProductSeries"].ToString(),
+        //                        URNNo = data["URNNo"].ToString(),
+        //                        URNDate = data["URNDate"].ToString(),
+        //                        ProductCode = data["ProductCode"].ToString(),
+        //                        ProductName = data["ProductName"].ToString(),
+        //                        SmallUomUnit = data["SmallUomUnit"].ToString(),
+        //                        SmallQuantity = (decimal)data["SmallQuantity"],
+        //                        DOCurrencyCode = data["DOCurrencyCode"].ToString(),
+        //                        Amount = (decimal)data["Amount"],
+        //                        StorageName = "GUDANG AG",
+        //                        SupplierName = "-",
+        //                        Country = data["Country"].ToString(),
+        //                        DeletedAgent = data["DeletedAgent"].ToString(),
+        //                        HsCode = data["HsCode"].ToString() == "" ? "-" : data["HsCode"].ToString(),
+        //                        RecordDate = data["RecordDate"].ToString()
+        //                    };
+
+        //                    reportData.Add(view);
+        //                }
+        //            }
+        //            conn.Close();
+        //        }
+        //    }
+        //    catch (SqlException ex)
+        //    { 
+        //    }
+
+        //    var Codes = await GetProductCode(string.Join(",", reportData.Select(x => x.ProductCode).Distinct().ToList()));
+
+        //    string[] exceptionBCNo = { "629905", "627663" , "038117", "046380", "621904", "758615", "643895" };
+        //    foreach(var a in reportData)
+        //    {
+        //        var trimProduct = a.ProductCode.Trim();
+        //        var remark = Codes.FirstOrDefault(x => x.Code.Trim() == trimProduct);
+        //        //var Composition = remark == null ? "-" : remark.Composition;
+        //        var Composition = remark == null ? "-" : (remark.Composition == null ? remark.Name : remark.Composition);
+
+        //        //var Width = remark == null ? "-" : remark.Width;
+        //        //var Const = remark == null ? "-" : remark.Const;
+        //        //var Yarn = remark == null ? "-" : remark.Yarn;
+        //        //var Name = remark == null ? "-" : remark.Name;
+
+        //        if (!exceptionBCNo.Contains(a.BeacukaiNo))
+        //        {
+        //            if(a.ProductName== remark.Name && a.ProductCode == remark.Code)
+        //            {
+        //                a.ProductName = remark != null ? string.Concat(/*a.ProductName, " - ",*/ Composition) : a.ProductName;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            a.ProductName = string.Concat(/*a.ProductName, " - ",*/ Composition + " - "+ a.DeletedAgent);
+        //        }
+        //    }
+
+        //    //Order by SerialNo
+        //    var groupedData = reportData
+        //        .GroupBy(x => new { x.BeacukaiNo, x.BeacukaiDate, x.CustomsType })
+        //        .Select(g => new
+        //        {
+        //            g.Key.BeacukaiNo,
+        //            g.Key.BeacukaiDate,
+        //            g.Key.CustomsType,
+        //            // Custom sorting untuk SerialNo string / angka
+        //            Items = g.OrderBy(i =>
+        //            {
+        //                // Jika bisa parse ke int, urutkan sebagai angka
+        //                return int.TryParse(i.SerialNo, out int n) ? n : int.MaxValue;
+        //            })
+        //    .ThenBy(i => i.SerialNo) // jika bukan angka, urutkan alfabet
+        //    .ToList()
+        //        })
+        //        .ToList();
+
+        //    // Flatten data sesuai urutan group dan SerialNo
+        //    var flattenedData = groupedData
+        //        .SelectMany(g => g.Items)
+        //        .ToList();
+
+
+
+        //    return flattenedData.AsQueryable();
+        //}
+        #endregion
         public async Task<IQueryable<ReceiptRawMaterialViewModel>> getQuery(DateTime? dateFrom, DateTime? dateTo)
         {
-            var d1 = dateFrom.Value.ToString("yyyy-MM-dd");
-            var d2 = dateTo.Value.ToString("yyyy-MM-dd");
-            var customCategory = "Fasilitas";
+            var d1 = dateFrom.Value.Date;
+            var d2 = dateTo.Value.Date;
 
-
-            List<ReceiptRawMaterialViewModel> reportData = new List<ReceiptRawMaterialViewModel>();
-
-            try
-            {
-                string connectionString = APIEndpoint.PurchasingConnectionString;
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-                    using (SqlCommand cmd = new SqlCommand(
-                        "declare @StartDate datetime = '" + d1 + "' declare @EndDate datetime = '" + d2 + "' " +
-                        "select distinct e.CustomsType,e.BeacukaiNo,convert(date,dateadd(hour,7,e.BeacukaiDate)) as BCDate," +
-                        "f.URNNo,convert(date,dateadd(hour,7,f.ReceiptDate)) as URNDate, a.DOCurrencyCode," +
-                        "a.SupplierName,a.Country, " +
-                        "c.ProductSeries,c.HsCode,a.RecordDate, c.DeletedAgent," +
-                        "COALESCE(NULLIF(g.PIBProductCode, ''), g.ProductCode) AS ProductCode," +
-                        "COALESCE(NULLIF(g.PIBProductName, ''), g.ProductName) AS ProductName, " +
-                        "COALESCE(NULLIF(g.PIBUom, ''), g.SmallUomUnit) AS SmallUomUnit," +
-                        "SUM(CASE WHEN g.PIBQuantity IS NOT NULL AND g.PIBQuantity <> 0 THEN g.PIBQuantity" +
-                        " ELSE g.SmallQuantity END ) AS SmallQuantity," +
-                        "SUM(CASE WHEN g.PIBValue IS NOT NULL AND g.PIBValue <> 0 THEN g.PIBValue " +
-                        "ELSE CAST((g.PricePerDealUnit * g.ReceiptQuantity) AS DECIMAL(18,2)) END) AS Amount " +
-                        "from GarmentDeliveryOrders a join GarmentDeliveryOrderItems b on a.id=b.GarmentDOId " +
-                        "join GarmentDeliveryOrderDetails c on b.id=c.GarmentDOItemId " +
-                        "join GarmentBeacukaiItems d on d.GarmentDOId=a.id join GarmentBeacukais e on e.id=d.BeacukaiId " +
-                        "join GarmentUnitReceiptNoteItems g on c.id=g.DODetailId join GarmentUnitReceiptNotes f on g.URNId=f.Id " +
-                        "where e.BeacukaiDate between @StartDate and @EndDate and a.CustomsCategory = '"+ customCategory +
-                        "' and f.URNType='PEMBELIAN' and a.IsDeleted=0 and b.IsDeleted=0 and c.IsDeleted=0 and d.IsDeleted=0 " +
-                        "and e.IsDeleted=0 and f.IsDeleted=0 and g.IsDeleted=0 " +
-                        "group by e.CustomsType,e.BeacukaiNo,e.BeacukaiDate,f.URNNo,f.ReceiptDate,g.ProductCode,g.ProductName,g.SmallUomUnit," +
-                        "a.DOCurrencyCode,a.SupplierName,a.Country,c.ProductSeries,c.HsCode,a.RecordDate,c.DeletedAgent, " +
-                        " g.PIBUom, g.PIBProductName, g.PIBProductCode  " +
-                        "order by BCDate asc", conn))
-
-                    {
-                        SqlDataAdapter dataAdapter = new SqlDataAdapter(cmd);
-                        DataSet dSet = new DataSet();
-                        dataAdapter.Fill(dSet);
-                        foreach (DataRow data in dSet.Tables[0].Rows)
+            var query = from a in context.Raw_Material_Income_Report
+                        where a.URNDate >= d1 && a.URNDate <= d2
+                        select new ReceiptRawMaterialViewModel
                         {
-                            ReceiptRawMaterialViewModel view = new ReceiptRawMaterialViewModel
-                            {
-                                CustomsType = data["CustomsType"].ToString(),
-                                BeacukaiNo = data["BeacukaiNo"].ToString(),
-                                BeacukaiDate = data["BCDate"].ToString(),
-                                SerialNo = data["ProductSeries"].ToString(),
-                                URNNo = data["URNNo"].ToString(),
-                                URNDate = data["URNDate"].ToString(),
-                                ProductCode = data["ProductCode"].ToString(),
-                                ProductName = data["ProductName"].ToString(),
-                                SmallUomUnit = data["SmallUomUnit"].ToString(),
-                                SmallQuantity = (decimal)data["SmallQuantity"],
-                                DOCurrencyCode = data["DOCurrencyCode"].ToString(),
-                                Amount = (decimal)data["Amount"],
-                                StorageName = "GUDANG AG",
-                                SupplierName = "-",
-                                Country = data["Country"].ToString(),
-                                DeletedAgent = data["DeletedAgent"].ToString(),
-                                HsCode = data["HsCode"].ToString() == "" ? "-" : data["HsCode"].ToString(),
-                                RecordDate = data["RecordDate"].ToString()
-                            };
+                            Amount = a.Price,
+                            BeacukaiDate = a.BeacukaiDate.Value.ToString("dd-MM-yyyy"),
+                            BeacukaiNo = a.BeacukaiNo,
+                            Country = a.Country,
+                            CustomsType = a.CustomsType,
+                            DOCurrencyCode = a.CurrencyCode,
+                            HsCode = a.HsCode,
+                            ProductCode = a.ProductCode,
+                            ProductName = a.ProductName,
+                            RecordDate = a.RecordDate.Value.ToString("dd-MM-yyyy"),
+                            URNNo = a.URNNo,
+                            SmallQuantity = a.SmallQuantity,
+                            SmallUomUnit = a.SmallUomUnit,
+                            SerialNo = a.SeriBarang.ToString(),
+                            URNDate = a.URNDate.Value.ToString("dd-MM-yyyy"),
+                            StorageName = a.StorageName,
+                        };
 
-                            reportData.Add(view);
-                        }
-                    }
-                    conn.Close();
-                }
-            }
-            catch (SqlException ex)
-            { 
-            }
+            return query.AsQueryable();
 
-            var Codes = await GetProductCode(string.Join(",", reportData.Select(x => x.ProductCode).Distinct().ToList()));
-
-            string[] exceptionBCNo = { "629905", "627663" , "038117", "046380", "621904", "758615", "643895" };
-            foreach(var a in reportData)
-            {
-                var trimProduct = a.ProductCode.Trim();
-                var remark = Codes.FirstOrDefault(x => x.Code.Trim() == trimProduct);
-                //var Composition = remark == null ? "-" : remark.Composition;
-                var Composition = remark == null ? "-" : (remark.Composition == null ? remark.Name : remark.Composition);
-
-                //var Width = remark == null ? "-" : remark.Width;
-                //var Const = remark == null ? "-" : remark.Const;
-                //var Yarn = remark == null ? "-" : remark.Yarn;
-                //var Name = remark == null ? "-" : remark.Name;
-
-                if (!exceptionBCNo.Contains(a.BeacukaiNo))
-                {
-                    if(a.ProductName== remark.Name && a.ProductCode == remark.Code)
-                    {
-                        a.ProductName = remark != null ? string.Concat(/*a.ProductName, " - ",*/ Composition) : a.ProductName;
-                    }
-                }
-                else
-                {
-                    a.ProductName = string.Concat(/*a.ProductName, " - ",*/ Composition + " - "+ a.DeletedAgent);
-                }
-            }
-
-            //Order by SerialNo
-            var groupedData = reportData
-                .GroupBy(x => new { x.BeacukaiNo, x.BeacukaiDate, x.CustomsType })
-                .Select(g => new
-                {
-                    g.Key.BeacukaiNo,
-                    g.Key.BeacukaiDate,
-                    g.Key.CustomsType,
-                    // Custom sorting untuk SerialNo string / angka
-                    Items = g.OrderBy(i =>
-                    {
-                        // Jika bisa parse ke int, urutkan sebagai angka
-                        return int.TryParse(i.SerialNo, out int n) ? n : int.MaxValue;
-                    })
-            .ThenBy(i => i.SerialNo) // jika bukan angka, urutkan alfabet
-            .ToList()
-                })
-                .ToList();
-            
-            // Flatten data sesuai urutan group dan SerialNo
-            var flattenedData = groupedData
-                .SelectMany(g => g.Items)
-                .ToList();
-
-            
-
-            return flattenedData.AsQueryable();
         }
         public async Task<Tuple<List<ReceiptRawMaterialViewModel>, int>> GetReport(DateTime? dateFrom, DateTime? dateTo, int page, int size, string Order)
         {
