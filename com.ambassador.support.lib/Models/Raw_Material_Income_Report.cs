@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace com.ambassador.support.lib.Models
@@ -32,11 +33,13 @@ namespace com.ambassador.support.lib.Models
 
         public string SmallUomUnit { get; set; }
 
-        public double SmallQuantity { get; set; }
+        [Column(TypeName = "decimal(14,4)")]
+        public decimal SmallQuantity { get; set; }
 
         public string CurrencyCode { get; set; }
 
-        public double Price { get; set; }
+        [Column(TypeName = "decimal(14,4)")]
+        public decimal Price { get; set; }
 
         public string StorageName { get; set; }
 
