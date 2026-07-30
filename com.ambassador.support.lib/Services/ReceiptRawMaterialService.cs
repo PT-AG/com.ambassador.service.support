@@ -201,7 +201,11 @@ namespace com.ambassador.support.lib.Services
                         select new ReceiptRawMaterialViewModel
                         {
                             Amount = a.Price,
-                            BeacukaiDate = a.BeacukaiDate.Value.ToString("dd-MM-yyyy"),
+
+                            BeacukaiDate = a.BeacukaiDate.HasValue
+            ? a.BeacukaiDate.Value.ToString("dd-MM-yyyy")
+            : null,
+
                             BeacukaiNo = a.BeacukaiNo,
                             Country = a.Country,
                             CustomsType = a.CustomsType,
@@ -209,14 +213,22 @@ namespace com.ambassador.support.lib.Services
                             HsCode = a.HsCode,
                             ProductCode = a.ProductCode,
                             ProductName = a.ProductName,
-                            RecordDate = a.RecordDate.Value.ToString("dd-MM-yyyy"),
+
+                            RecordDate = a.RecordDate.HasValue
+            ? a.RecordDate.Value.ToString("dd-MM-yyyy")
+            : null,
+
                             URNNo = a.URNNo,
                             SmallQuantity = a.SmallQuantity,
                             SmallUomUnit = a.SmallUomUnit,
                             SerialNo = a.SeriBarang.ToString(),
-                            URNDate = a.URNDate.Value.ToString("dd-MM-yyyy"),
+
+                            URNDate = a.URNDate.HasValue
+            ? a.URNDate.Value.ToString("dd-MM-yyyy")
+            : null,
+
                             StorageName = a.StorageName,
-                            SupplierName=a.SupplierName
+                            SupplierName = a.SupplierName
                         };
 
             return query.AsQueryable();
