@@ -241,7 +241,7 @@ namespace com.ambassador.support.lib.Services
             Dictionary<string, string> OrderDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(Order);
             if (OrderDictionary.Count.Equals(0))
             {
-                //Query = Query.OrderBy(b => b.BeacukaiDate);
+                Query = Query.OrderBy(b => b.BeacukaiNo).ThenBy(a=>a.BeacukaiDate).ThenBy(c=>c.HsCode).ThenBy(d=>d.SerialNo).ThenBy(e => e.RecordDate);
             }
             else
             {
