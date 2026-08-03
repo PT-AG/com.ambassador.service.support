@@ -3,10 +3,13 @@ using com.ambassador.support.lib.Interfaces;
 using com.ambassador.support.lib.ViewModel;
 using Com.Moonlay.NetCore.Lib;
 using Newtonsoft.Json;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -241,7 +244,7 @@ namespace com.ambassador.support.lib.Services
             Dictionary<string, string> OrderDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(Order);
             if (OrderDictionary.Count.Equals(0))
             {
-                Query = Query.OrderBy(b => b.BeacukaiNo).ThenBy(a=>a.BeacukaiDate).ThenBy(c=>c.HsCode).ThenBy(d=>d.SerialNo).ThenBy(e => e.RecordDate);
+                Query = Query.OrderBy(b => b.BeacukaiNo).ThenBy(a => a.BeacukaiDate).ThenBy(c => c.HsCode).ThenBy(d => d.SerialNo).ThenBy(e => e.RecordDate);
             }
             else
             {
@@ -261,44 +264,224 @@ namespace com.ambassador.support.lib.Services
 
         public async Task<MemoryStream> GenerateExcel(DateTime? dateFrom, DateTime? dateTo)
         {
-            var Query = await getQuery(dateFrom, dateTo);
-            //Query = Query.OrderBy(b => b.BeacukaiDate);
-            DataTable result = new DataTable();
-            result.Columns.Add(new DataColumn() { ColumnName = "No", DataType = typeof(String) });
-            result.Columns.Add(new DataColumn() { ColumnName = "Tgl Rekam", DataType = typeof(String) });
-            result.Columns.Add(new DataColumn() { ColumnName = "Jenis Dokumen", DataType = typeof(String) });
-            result.Columns.Add(new DataColumn() { ColumnName = "No Bea Cukai", DataType = typeof(String) });
-            result.Columns.Add(new DataColumn() { ColumnName = "Tgl Bea Cukai", DataType = typeof(String) });
-            result.Columns.Add(new DataColumn() { ColumnName = "Kode HS", DataType = typeof(String) });
-            result.Columns.Add(new DataColumn() { ColumnName = "Nomor Seri Barang", DataType = typeof(String) });
-            result.Columns.Add(new DataColumn() { ColumnName = "No Bukti Penerimaan", DataType = typeof(String) });
-            result.Columns.Add(new DataColumn() { ColumnName = "Tgl Bukti Penerimaan", DataType = typeof(String) });
-            result.Columns.Add(new DataColumn() { ColumnName = "Kode Barang", DataType = typeof(String) });
-            result.Columns.Add(new DataColumn() { ColumnName = "Nama Barang", DataType = typeof(String) });
-            result.Columns.Add(new DataColumn() { ColumnName = "Satuan", DataType = typeof(String) });
-            result.Columns.Add(new DataColumn() { ColumnName = "Jumlah Terima", DataType = typeof(double) });
-            result.Columns.Add(new DataColumn() { ColumnName = "Mata Uang", DataType = typeof(String) });
-            result.Columns.Add(new DataColumn() { ColumnName = "Nilai Barang", DataType = typeof(double) });
-            result.Columns.Add(new DataColumn() { ColumnName = "Gudang", DataType = typeof(String) });
-            result.Columns.Add(new DataColumn() { ColumnName = "Penerima Sub Kontrak", DataType = typeof(String) });
-            result.Columns.Add(new DataColumn() { ColumnName = "Negara Asal Barang", DataType = typeof(String) });
+            var query = (await getQuery(dateFrom, dateTo)).ToList().OrderBy(b => b.BeacukaiNo).ThenBy(a => a.BeacukaiDate).ThenBy(c => c.HsCode).ThenBy(d => d.SerialNo).ThenBy(e => e.RecordDate);
 
-            if (Query.ToArray().Count() == 0)
+            var result = new DataTable();
+
+            result.Columns.Add("No", typeof(string));
+            result.Columns.Add("Tgl Rekam", typeof(string));
+            result.Columns.Add("Jenis Dokumen", typeof(string));
+            result.Columns.Add("No Bea Cukai", typeof(string));
+            result.Columns.Add("Tgl Bea Cukai", typeof(string));
+            result.Columns.Add("Kode HS", typeof(string));
+            result.Columns.Add("Nomor Seri Barang", typeof(string));
+            result.Columns.Add("No Bukti Penerimaan", typeof(string));
+            result.Columns.Add("Tgl Bukti Penerimaan", typeof(string));
+            result.Columns.Add("Kode Barang", typeof(string));
+            result.Columns.Add("Nama Barang", typeof(string));
+            result.Columns.Add("Satuan", typeof(string));
+            result.Columns.Add("Jumlah Terima", typeof(double));
+            result.Columns.Add("Mata Uang", typeof(string));
+            result.Columns.Add("Nilai Barang", typeof(double));
+            result.Columns.Add("Gudang", typeof(string));
+            result.Columns.Add("Penerima Sub Kontrak", typeof(string));
+            result.Columns.Add("Negara Asal Barang", typeof(string));
+
+            if (!query.Any())
             {
-                result.Rows.Add("", "", "", "", "", "", "", "", "", "", "", "", 0, "", 0, "", "", ""); // to allow column name to be generated properly for empty data as template
+                // Agar header tetap tergenerate untuk template kosong
+                result.Rows.Add(
+                    "", "", "", "", "", "",
+                    "", "", "", "", "", "",
+                    0D, "", 0D, "", "", ""
+                );
             }
             else
             {
-                int i = 0;
-                foreach (var item in Query)
+                var no = 0;
+
+                foreach (var item in query)
                 {
-                    i++;
-                    result.Rows.Add(i.ToString(), item.RecordDate,item.CustomsType,item.BeacukaiNo,item.BeacukaiDate, item.HsCode,item.SerialNo,item.URNNo,item.URNDate,item.ProductCode,
-                                    item.ProductName,item.SmallUomUnit,item.SmallQuantity,item.DOCurrencyCode,item.Amount,item.StorageName,item.SupplierName,item.Country);
+                    no++;
+
+                    result.Rows.Add(
+                        no.ToString(),
+                        item.RecordDate,
+                        item.CustomsType,
+                        item.BeacukaiNo,
+                        item.BeacukaiDate,
+                        item.HsCode,
+                        item.SerialNo,
+                        item.URNNo,
+                        item.URNDate,
+                        item.ProductCode,
+                        item.ProductName,
+                        item.SmallUomUnit,
+                        item.SmallQuantity,
+                        item.DOCurrencyCode,
+                        item.Amount,
+                        item.StorageName,
+                        item.SupplierName,
+                        item.Country
+                    );
                 }
             }
-            return Excel.CreateExcel(new List<KeyValuePair<DataTable, string>>() { new KeyValuePair<DataTable, string>(result, "Territory") }, true);
 
+            var initialStream = Excel.CreateExcel(
+                new List<KeyValuePair<DataTable, string>>
+                {
+            new KeyValuePair<DataTable, string>(
+                result,
+                "Territory"
+            )
+                },
+                true
+            );
+
+            initialStream.Position = 0;
+
+            using (var package = new ExcelPackage(initialStream))
+            {
+                var worksheet = package.Workbook.Worksheets["Territory"];
+
+                if (worksheet != null &&
+                    worksheet.Dimension != null &&
+                    query.Any())
+                {
+                    const int firstDataRow = 2;
+
+                    // ProductCode/Kode Barang = kolom J = 10
+                    const int firstMergeColumn = 10;
+
+                    // Country/Negara Asal Barang = kolom R = 18
+                    const int lastMergeColumn = 18;
+
+                    MergeIdenticalRows(
+                        worksheet,
+                        firstDataRow,
+                        firstMergeColumn,
+                        lastMergeColumn
+                    );
+                }
+
+                var outputStream = new MemoryStream();
+
+                package.SaveAs(outputStream);
+
+                outputStream.Position = 0;
+
+                return outputStream;
+            }
+        }
+
+        private static void MergeIdenticalRows(ExcelWorksheet worksheet, int firstDataRow, int firstColumn, int lastColumn)
+        {
+            var lastDataRow = worksheet.Dimension.End.Row;
+
+            if (lastDataRow < firstDataRow)
+            {
+                return;
+            }
+
+            var groupStartRow = firstDataRow;
+
+            for (var currentRow = firstDataRow + 1;
+                 currentRow <= lastDataRow + 1;
+                 currentRow++)
+            {
+                var isSameGroup =
+                    currentRow <= lastDataRow &&
+                    AreRowsEqual(
+                        worksheet,
+                        currentRow - 1,
+                        currentRow,
+                        firstColumn,
+                        lastColumn
+                    );
+
+                if (isSameGroup)
+                {
+                    continue;
+                }
+
+                var groupEndRow = currentRow - 1;
+
+                if (groupEndRow > groupStartRow)
+                {
+                    MergeRowGroup(
+                        worksheet,
+                        groupStartRow,
+                        groupEndRow,
+                        firstColumn,
+                        lastColumn
+                    );
+                }
+
+                groupStartRow = currentRow;
+            }
+        }
+
+        private static bool AreRowsEqual(ExcelWorksheet worksheet, int firstRow, int secondRow, int firstColumn, int lastColumn)
+        {
+            for (var column = firstColumn;
+                 column <= lastColumn;
+                 column++)
+            {
+                var firstValue = NormalizeCellValue(
+                    worksheet.Cells[firstRow, column].Value
+                );
+
+                var secondValue = NormalizeCellValue(
+                    worksheet.Cells[secondRow, column].Value
+                );
+
+                if (!string.Equals(
+                        firstValue,
+                        secondValue,
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static void MergeRowGroup(ExcelWorksheet worksheet, int startRow, int endRow, int firstColumn, int lastColumn)
+        {
+            for (var column = firstColumn;
+                 column <= lastColumn;
+                 column++)
+            {
+                var range = worksheet.Cells[
+                    startRow,
+                    column,
+                    endRow,
+                    column
+                ];
+
+                range.Merge = true;
+
+                range.Style.VerticalAlignment =
+                    ExcelVerticalAlignment.Center;
+            }
+        }
+
+        private static string NormalizeCellValue(object value)
+        {
+            if (value == null)
+            {
+                return string.Empty;
+            }
+
+            if (value is string stringValue)
+            {
+                return stringValue.Trim();
+            }
+
+            return Convert
+                .ToString(value, CultureInfo.InvariantCulture)
+                ?.Trim() ?? string.Empty;
         }
 
         string formattedDate(string num)
@@ -306,7 +489,7 @@ namespace com.ambassador.support.lib.Services
             DateTime date = DateTime.Parse(num);
 
             string datee = date.ToString("dd MMMM yyyy");
-            
+
 
             return datee;
         }
