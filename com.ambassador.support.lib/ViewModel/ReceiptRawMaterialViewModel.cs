@@ -8,10 +8,10 @@ namespace com.ambassador.support.lib.ViewModel
     {
         public string CustomsType { get; set; }
         public string BeacukaiNo { get; set; }
-        public string BeacukaiDate { get; set; }
+        public DateTime? BeacukaiDate { get; set; }
         public string SerialNo { get; set; }
         public string URNNo { get; set; }
-        public string URNDate { get; set; }
+        public DateTime? URNDate { get; set; }
         public string ProductCode { get; set; }
         public string ProductName { get; set; }
         public decimal SmallQuantity { get; set; }
@@ -23,6 +23,6 @@ namespace com.ambassador.support.lib.ViewModel
         public string Country { get; set; }        
         public string DeletedAgent { get; set; }      
         public string HsCode { get; set; }
-        public string RecordDate { get; set; }
+        public DateTime? RecordDate { get; set; }
     }
 }

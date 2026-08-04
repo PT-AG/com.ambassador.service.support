@@ -205,9 +205,7 @@ namespace com.ambassador.support.lib.Services
                         {
                             Amount = a.Price,
 
-                            BeacukaiDate = a.BeacukaiDate.HasValue
-            ? a.BeacukaiDate.Value.ToString("dd-MM-yyyy")
-            : null,
+                            BeacukaiDate = a.BeacukaiDate,
 
                             BeacukaiNo = a.BeacukaiNo,
                             Country = a.Country,
@@ -217,18 +215,14 @@ namespace com.ambassador.support.lib.Services
                             ProductCode = a.ProductCode,
                             ProductName = a.ProductName,
 
-                            RecordDate = a.RecordDate.HasValue
-            ? a.RecordDate.Value.ToString("dd-MM-yyyy")
-            : null,
+                            RecordDate = a.RecordDate,
 
                             URNNo = a.URNNo,
                             SmallQuantity = a.SmallQuantity,
                             SmallUomUnit = a.SmallUomUnit,
                             SerialNo = a.SeriBarang.ToString(),
 
-                            URNDate = a.URNDate.HasValue
-            ? a.URNDate.Value.ToString("dd-MM-yyyy")
-            : null,
+                            URNDate = a.URNDate,
 
                             StorageName = a.StorageName,
                             SupplierName = a.SupplierName
@@ -244,7 +238,7 @@ namespace com.ambassador.support.lib.Services
             Dictionary<string, string> OrderDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(Order);
             if (OrderDictionary.Count.Equals(0))
             {
-                Query = Query.OrderBy(b => b.BeacukaiNo).ThenBy(a => a.BeacukaiDate).ThenBy(c => c.HsCode).ThenBy(d => d.SerialNo).ThenBy(e => e.RecordDate);
+                Query = Query.OrderBy(b => b.BeacukaiDate).ThenBy(a => a.BeacukaiNo).ThenBy(d => d.SerialNo);
             }
             else
             {
@@ -264,7 +258,7 @@ namespace com.ambassador.support.lib.Services
 
         public async Task<MemoryStream> GenerateExcel(DateTime? dateFrom, DateTime? dateTo)
         {
-            var query = (await getQuery(dateFrom, dateTo)).ToList().OrderBy(b => b.BeacukaiNo).ThenBy(a => a.BeacukaiDate).ThenBy(c => c.HsCode).ThenBy(d => d.SerialNo).ThenBy(e => e.RecordDate);
+            var query = (await getQuery(dateFrom, dateTo)).ToList().OrderBy(b => b.BeacukaiDate).ThenBy(a => a.BeacukaiNo).ThenBy(d => d.SerialNo);
 
             var result = new DataTable();
 
@@ -299,21 +293,23 @@ namespace com.ambassador.support.lib.Services
             else
             {
                 var no = 0;
-
                 foreach (var item in query)
                 {
+                    var BCDate = item.BeacukaiDate.HasValue ? item.BeacukaiDate.Value.ToString("dd MMM yyyy") : null;
+                    var RecordDate = item.RecordDate.HasValue ? item.RecordDate.Value.ToString("dd MMM yyyy") : null;
+                    var URNDate = item.URNDate.HasValue ? item.URNDate.Value.ToString("dd MMM yyyy") : null;
                     no++;
 
                     result.Rows.Add(
                         no.ToString(),
-                        item.RecordDate,
+                        RecordDate,
                         item.CustomsType,
                         item.BeacukaiNo,
-                        item.BeacukaiDate,
+                        BCDate,
                         item.HsCode,
                         item.SerialNo,
                         item.URNNo,
-                        item.URNDate,
+                        URNDate,
                         item.ProductCode,
                         item.ProductName,
                         item.SmallUomUnit,
