@@ -36,4 +36,15 @@ namespace com.ambassador.support.lib.ViewModel
         public DateTime TglDatang { get; set; }
         public string Vendor { get; set; }
     }
+
+    public class BEACUKAI_ToDeleteViewModel
+    {
+        public string CreatedBy { get; set; }
+        public DateTime TglBCNo { get; set; }
+        public string BCNo { get; set; }
+        public string Jenis { get; set; }
+        public string NoAju { get; set; }
+        public string JenisBC { get; set; }
+        public bool isEdit { get; set; }
+    }
 }
