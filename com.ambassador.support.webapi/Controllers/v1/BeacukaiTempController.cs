@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using com.ambassador.support.lib.Services;
+using com.ambassador.support.lib.ViewModel;
 using com.ambassador.support.webapi.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -39,6 +40,48 @@ namespace com.ambassador.support.webapi.Controllers.v1
                         count = data.Count
                     }
                 });
+            }
+            catch (Exception e)
+            {
+                Dictionary<string, object> Result =
+                    new ResultFormatter(ApiVersion, General.INTERNAL_ERROR_STATUS_CODE, e.Message)
+                    .Fail();
+                return StatusCode(General.INTERNAL_ERROR_STATUS_CODE, Result);
+            }
+        }
+
+        [HttpGet("to-delete")]
+        public async Task<IActionResult> GetDataToDelete(string jenis, string type, string nomor)
+        {
+            try
+            {
+                var data = await Service.GetDataForDelete(jenis, type, nomor);
+                return Ok(new
+                {
+                    apiVersion = ApiVersion,
+                    data,
+                    info = new
+                    {
+
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                Dictionary<string, object> Result =
+                    new ResultFormatter(ApiVersion, General.INTERNAL_ERROR_STATUS_CODE, e.Message)
+                    .Fail();
+                return StatusCode(General.INTERNAL_ERROR_STATUS_CODE, Result);
+            }
+        }
+
+        [HttpPut("delete")]
+        public async Task<IActionResult> DeleteData([FromBody] List<BEACUKAI_ToDeleteViewModel> data)
+        {
+            try
+            {
+                await Service.DeleteData(data);
+                return NoContent();
             }
             catch (Exception e)
             {
