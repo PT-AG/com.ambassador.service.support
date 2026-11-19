@@ -15,13 +15,14 @@ namespace com.ambassador.support.lib
 		public virtual DbSet<WIPViewModel> ViewWIP { get; set; }
         public virtual DbSet<HOrder> HOrder { get; set; }
         public virtual DbSet<Raw_Material_Income_Report> Raw_Material_Income_Report { get; set; }
+        public virtual DbSet<Raw_Material_Outcome_Report> Raw_Material_Outcome_Report { get; set; }
         public DbSet<BEACUKAI_ADDED> BEACUKAI_ADDED { get; set; }
         public DbSet<BEACUKAI_ADDED_DETAIL> BEACUKAI_ADDED_DETAIL { get; set; }
-
 
         public SupportDbContext(DbContextOptions<SupportDbContext> options) : base(options)
         {
         }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<BEACUKAI_TEMP>(entity =>
@@ -198,13 +199,11 @@ namespace com.ambassador.support.lib
 
 			modelBuilder.Entity<ScrapViewModel>(entity =>
 			{
-				 
 				entity.Property(e => e.ClassificationId)
 					.HasColumnName("ClassificationId");
 
 				entity.Property(e => e.ClassificationId);
 				 
-
 				entity.Property(e => e.ClassificationCode);
 
 				entity.Property(e => e.ClassificationName);
@@ -228,18 +227,14 @@ namespace com.ambassador.support.lib
 				entity.Property(e => e.StockId);
 
 				entity.Property(e => e.SaldoBuku);
-
-			
 			});
 
 			modelBuilder.Entity<WIPViewModel>(entity =>
 			{
-
 				entity.Property(e => e.Kode);
 				entity.Property(e => e.Comodity);
 				entity.Property(e => e.WIP);
 				entity.Property(e => e.UnitQtyName );
-
 			});
 		}
     }

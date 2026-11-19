@@ -18,11 +18,15 @@ namespace com.ambassador.support.lib.Services
     {
         IPurchasingDBContext context;
         public readonly IServiceProvider serviceProvider;
-        public ExpenditureRawMaterialService(IPurchasingDBContext _context, IServiceProvider serviceProvider)
+        private readonly SupportDbContext dbContext;
+
+        public ExpenditureRawMaterialService(IPurchasingDBContext _context, IServiceProvider serviceProvider, SupportDbContext dbContext)
         {
             this.context = _context;
             this.serviceProvider = serviceProvider;
+            this.dbContext = dbContext;
         }
+
         public async Task<IQueryable<ExpenditureRawMaterialViewModel>> getQuery(DateTimeOffset? dateFrom, DateTimeOffset? dateTo, int offset)
         {
             DateTimeOffset d1 = dateFrom.Value.AddHours(offset);
@@ -81,14 +85,12 @@ namespace com.ambassador.support.lib.Services
                                 QuantitySubcon = data["ExpenditureType"].ToString() == "SUBCON" ? (double)data["Quantity"] : 0,
                                 ExpenditureType = data["ExpenditureType"].ToString(),
                                 SubconTo = "-"
-
                             };
+
                             reportData.Add(view);
                         }
-
-                       
-
                     }
+
                     conn.Close();
                 }
             }
@@ -108,33 +110,58 @@ namespace com.ambassador.support.lib.Services
                 //var Const = remark == null ? "-" : remark.Const;
                 //var Yarn = remark == null ? "-" : remark.Yarn;
                 //var Name = remark == null ? "-" : remark.Name;
-
                 a.ProductName = remark != null ? string.Concat(a.ProductName, " - ", Composition/*, "", Width, "", Const, "", Yarn*/) : a.ProductName;
-
             }
+
             return reportData.AsQueryable();
         }
+
+        public async Task<IQueryable<ExpenditureRawMaterialViewModel>> getQueryV2(DateTimeOffset? dateFrom, DateTimeOffset? dateTo, int offset)
+        {
+            DateTimeOffset d1 = dateFrom.Value.AddHours(offset).Date;
+            DateTimeOffset d2 = dateTo.Value.AddHours(offset).Date;
+            //var reportData = new List<ExpenditureRawMaterialViewModel>();
+
+            try
+            {
+                var a = (from i in dbContext.Raw_Material_Outcome_Report
+                         where i.UENDate >= d1 && i.UENDate <= d2
+                         select new ExpenditureRawMaterialViewModel
+                         {
+                             ExpenditureDate = i.UENDate.GetValueOrDefault().ToString(),
+                             ProductCode = i.ProductCode,
+                             ProductName = i.ProductName,
+                             RONo = i.RONo,
+                             UENNo = i.UENNo,
+                             //ExpenditureType = i.MatchStatus,
+                             UomUnit = i.UomUnit,
+                             Quantity = Convert.ToDouble(i.Quantity),
+                             QuantitySubcon = Convert.ToDouble(i.QuantitySubcon),
+                             SubconTo = i.ReceiptSubconName
+                         });
+
+                return a;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<Tuple<List<ExpenditureRawMaterialViewModel>, int>> GetReport(DateTimeOffset? dateFrom, DateTimeOffset? dateTo, int page, int size, string Order, int offset)
         {
-            var Query = await getQuery(dateFrom, dateTo, offset);
-
+            var Query = await getQueryV2(dateFrom, dateTo, offset);
             Dictionary<string, string> OrderDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(Order);
-            if (OrderDictionary.Count.Equals(0))
-            {
+
+            if (OrderDictionary.Count.Equals(0)) {
                 Query = Query.OrderBy(b => b.ExpenditureDate);
-            }
-            else
-            {
+            } else {
                 string Key = OrderDictionary.Keys.First();
                 string OrderType = OrderDictionary[Key];
-
-                //Query = Query.OrderBy(string.Concat(Key, " ", OrderType));
             }
-
 
             Pageable<ExpenditureRawMaterialViewModel> pageable = new Pageable<ExpenditureRawMaterialViewModel>(Query, page - 1, size);
             List<ExpenditureRawMaterialViewModel> Data = pageable.Data.ToList<ExpenditureRawMaterialViewModel>();
-
             int TotalData = pageable.TotalCount;
 
             return Tuple.Create(Data, TotalData);
@@ -142,12 +169,14 @@ namespace com.ambassador.support.lib.Services
 
         public async Task<MemoryStream> GenerateExcel(DateTimeOffset? dateFrom, DateTimeOffset? dateTo, int offset)
         {
-            var Query = await getQuery(dateFrom, dateTo, offset);
+            var Query = await getQueryV2(dateFrom, dateTo, offset);
             Query = Query.OrderBy(b => b.ExpenditureDate);
+
             DataTable result = new DataTable();
             result.Columns.Add(new DataColumn() { ColumnName = "No", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "No Bon", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Tanggal Keluar", DataType = typeof(String) });
+            result.Columns.Add(new DataColumn() { ColumnName = "No RO", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Kode Barang", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Nama Barang", DataType = typeof(String) });
             result.Columns.Add(new DataColumn() { ColumnName = "Satuan", DataType = typeof(String) });
@@ -155,33 +184,26 @@ namespace com.ambassador.support.lib.Services
             result.Columns.Add(new DataColumn() { ColumnName = "Jml DiSubKontrakan", DataType = typeof(double) });
             result.Columns.Add(new DataColumn() { ColumnName = "Penerima SubKontrak", DataType = typeof(String) });
 
-            if (Query.ToArray().Count() == 0)
-            {
-                result.Rows.Add("", "", "", "", "", "", 0,0,""); // to allow column name to be generated properly for empty data as template
-            }
-            else
-            {
+            if (Query.ToArray().Count() == 0) {
+                result.Rows.Add("", "", "", "", "", "", "", 0, 0, ""); // to allow column name to be generated properly for empty data as template
+            } else {
                 int i = 0;
-                foreach (var item in Query)
-                {
+                foreach (var item in Query) {
                     i++;
-                    result.Rows.Add(i.ToString(), item.UENNo,formattedDate(item.ExpenditureDate), item.ProductCode, item.ProductName, item.UomUnit,item.Quantity,item.QuantitySubcon,item.SubconTo);
+                    result.Rows.Add(i.ToString(), item.UENNo, formattedDate(item.ExpenditureDate), item.RONo, item.ProductCode, item.ProductName, item.UomUnit, item.Quantity, item.QuantitySubcon, item.SubconTo);
                 }
             }
-            return Excel.CreateExcel(new List<KeyValuePair<DataTable, string>>() { new KeyValuePair<DataTable, string>(result, "Territory") }, true);
 
+            return Excel.CreateExcel(new List<KeyValuePair<DataTable, string>>() { new KeyValuePair<DataTable, string>(result, "Territory") }, true);
         }
 
         string formattedDate(string num)
         {
             DateTime date = DateTime.Parse(num);
-
             string datee = date.ToString("dd MMMM yyyy");
-            
 
             return datee;
         }
-
 
         private async Task<List<GarmentProductViewModel>> GetProductCode(string codes)
         {

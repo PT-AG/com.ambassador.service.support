@@ -28,8 +28,6 @@ namespace com.ambassador.support.lib
 
         public IDataReader ExecuteReader(string query, ICollection<SqlParameter> parameters)
         {
-
-
             SqlCommand command = new SqlCommand(query, _connection);
             foreach (var parameter in parameters)
             {
@@ -37,14 +35,11 @@ namespace com.ambassador.support.lib
             }
 
             return command.ExecuteReader();
-
         }
+
         public IDataReader ExecuteReader2(string query)
         {
-
-
             SqlCommand command = new SqlCommand(query, _connection);
-
             return command.ExecuteReader();
         }
 
