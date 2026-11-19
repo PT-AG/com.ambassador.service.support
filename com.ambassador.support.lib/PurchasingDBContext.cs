@@ -39,6 +39,7 @@ namespace com.ambassador.support.lib
             return command.ExecuteReader();
 
         }
+
         public IDataReader ExecuteReader2(string query)
         {
 

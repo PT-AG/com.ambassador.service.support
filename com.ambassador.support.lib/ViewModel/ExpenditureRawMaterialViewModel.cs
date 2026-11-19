@@ -6,6 +6,7 @@ namespace com.ambassador.support.lib.ViewModel
 {
     public class ExpenditureRawMaterialViewModel
     {
+        public string RONo { get; set; }
         public string UENNo { get; set; }
         public string ExpenditureDate { get; set; }
         public string ProductCode { get; set; }
@@ -15,6 +16,5 @@ namespace com.ambassador.support.lib.ViewModel
         public double QuantitySubcon { get; set; }
         public string ExpenditureType { get; set; }
         public string SubconTo { get; set; }
-
     }
 }
